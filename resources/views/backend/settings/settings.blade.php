@@ -1,6 +1,7 @@
 @extends('layout.base')
 
 @section("custom_css")
+<link href="/backend/assets/build/css/intlTelInput.css" rel="stylesheet" type="text/css" />
 
     <style>
         .line-head {
@@ -138,7 +139,7 @@
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <label>Phone Number</label>
-                                                            <input class="form-control" type="text" name="phone_number" value="{{ isset($user_details['phone_number']) ? $user_details['phone_number'] : "" }}" readonly>
+                                                           <input class="form-control" type="text" id ="phone" name="phone_number" value="{{ isset($user_details['phone_number']) ? $user_details['phone_number'] : "" }}" readonly>
                                                         </div>
                                                     </div>
                                                     <div class="clearfix"></div><br>
@@ -393,8 +394,35 @@
 @endsection
 
 @section("javascript")
-<script>
-var navigation = () => {
+
+     <script src="/backend/assets/build/js/intlTelInput.js"></script>
+     <script>
+         var input = document.querySelector("#phone");
+                var test = window.intlTelInput(input, {
+                    separateDialCode: true,
+                    //initialCountry: "de",
+                    // any initialisation options go here
+                });
+
+                test.setNumber("+" + ($("#phone").val()));
+
+                $("#phone").keyup(() => {
+                    if ($("#phone").val().charAt(0) == 0) {
+                        $("#phone").val($("#phone").val().substring(1));
+                    }
+                });
+                $("#submitForm").submit((e) => {
+                    e.preventDefault();
+                    const dialCode = test.getSelectedCountryData().dialCode;
+                    if ($("#phone").val().charAt(0) == 0) {
+                        $("#phone").val($("#phone").val().substring(1));
+                    }
+                    $("#phone_number").val(dialCode + $("#phone").val());
+                    $("#submitForm").off('submit').submit();
+                });
+     </script>
+<script>    
+    var navigation = () => {
   var locationHash = window.location.hash || "#edit-profile";
   $(".hash-candidate").removeClass("active");
   $(locationHash).addClass("active");
