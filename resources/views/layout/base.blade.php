@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>mycustomer - Admin & Dashboard Template</title>
+    <title>mycustomer - Welcome</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="MyCustomer - JusticeLeague" name="description" />
     <meta content="JusticeLeague" name="author" />
@@ -20,13 +20,13 @@
     <link href="{{asset('backend/assets/css/bootstrap.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('backend/assets/css/icons.min.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('backend/assets/css/app.min.css')}}" rel="stylesheet" type="text/css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/shepherd/2.0.0-beta.1/css/shepherd-theme-arrows.css" />
+    <link href="{{asset('backend/assets/css/custom.css')}}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shepherd/2.0.0-beta.1/css/shepherd-theme-arrows.css" />
     <link href="{{asset('backend/assets/css/tourguide.css')}}" rel="stylesheet" type="text/css">
     <style>
-      .dissapear {
-        display: none !important;
-      }
+        .dissapear {
+            display: none !important;
+        }
     </style>
 
     <!-- Other Style CSS -->
@@ -79,7 +79,6 @@
 
     <!-- App js -->
     <script src="/backend/assets/js/app.min.js"></script>
-
     @yield('javascript')
 </body>
 

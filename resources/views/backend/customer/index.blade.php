@@ -2,10 +2,8 @@
 @section("custom_css")
 <link href="/backend/assets/build/css/intlTelInput.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
-<link rel="stylesheet" href="backend/assets/css/all_users.css">
-<link rel="stylesheet" href="/backend/assets/css/complaintsLog.css">
-<link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="/backend/assets/css/datatablestyle.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 @stop
 @section('content')
 <div class="content">
@@ -30,7 +28,7 @@
 
 
 
-<div class="container">
+<div class="container-fluid">
     <div class="content">
 
         <div class="container-fluid">
@@ -38,18 +36,34 @@
             <div class="row page-title">
                 <div class="col-md-12">
                     <h4 class="card-header mb-1 mt-0 float-left h5">List of Registered Customers</h4>
-
-                    <a href="#" class="btn btn-primary float-right" data-toggle="modal" data-target="#CustomerModal">
-                        New &nbsp;<i class="fa fa-plus my-float"></i>
-                    </a>
-
+                    @if(Cookie::get('user_role') != 'store_assistant')
+                        <a href="#" class="btn btn-primary float-right" data-toggle="modal" data-target="#CustomerModal">
+                            New &nbsp;<i class="fa fa-plus my-float"></i>
+                        </a>
+                    @endif
+                    <div class="btn-group float-right mr-2">
+                        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class='uil uil-file-alt mr-1'></i>Export
+                            <i class="icon"><span data-feather="chevron-down"></span></i></button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <button id="ExportReporttoExcel" class="dropdown-item notify-item">
+                                <i data-feather="file" class="icon-dual icon-xs mr-2"></i>
+                                <span>Excel</span>
+                            </button>
+                            <button id="ExportReporttoPdf" class="dropdown-item notify-item">
+                                <i data-feather="file" class="icon-dual icon-xs mr-2"></i>
+                                <span>PDF</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             @if ( isset($response) && count($response) > 0 )
             <div class="card-body p-1 card">
                 <div class="table-responsive table-data" style="padding: 10px">
-                    <table id="basic-datatable" class="table dt-responsive nowrap table table-striped table-bordered">
+                    <table id="customerTable" class="table dt-responsive nowrap table table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -61,18 +75,12 @@
                             </tr>
 
                         <tbody>
-                            @for ($i = 0; $i < count($response); $i++) <tr>
+                            @foreach($response as $i => $customer) <tr>
                                 <td>{{$i + 1}}</td>
-                                <td>{{ ucfirst($response[$i]->name) }}</td>
-                                <td>{{ $response[$i]->phone_number }}</td>
-                                <td>{{ $response[$i]->store_name }}</td>
-                                {{-- <td>
-                                                    <span> &#8358; 1 500</span> <br>
-                                                    <span class="badge badge-primary">You Paid: 1000</span>
-                                                </td>
-                                                <td>
-                                                    <span class="text-danger">&#8358; 500</span>
-                                                </td> --}}
+                                <td>{{ ucfirst($customer->name) }}</td>
+                                <td>{{ $customer->phone_number }}</td>
+                                <td>{{ $customer->store_name }}</td>
+
                                 <td>
                                     <div class="btn-group mt-2 mr-1">
                                         <button type="button" class="btn btn-primary dropdown-toggle"
@@ -80,35 +88,38 @@
                                             Actions<i class="icon"><span data-feather="chevron-down"></span></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-right">
+                                            @if(Cookie::get('user_role') == 'store_admin')
+                                                <a class="dropdown-item"
+                                                href="{{ route('customer.edit', $customer->store_id.'-'.$customer->_id) }}">
+                                                Edit Customer</a>
+                                            @endif
                                             <a class="dropdown-item"
-                                                href="{{ route('customer.edit', $response[$i]->store_id.'-'.$response[$i]->_id) }}">Edit
-                                                Customer</a>
-                                            <a class="dropdown-item"
-                                                href="{{ route('customer.show', $response[$i]->store_id.'-'.$response[$i]->_id) }}">View
+                                                href="{{ route('customer.show', $customer->store_id.'-'.$customer->_id) }}">View
                                                 Profile</a>
                                             {{-- <a class="dropdown-item"
                                                                 href="{{ route('transaction.index') }}">View
                                             Transaction</a>
                                             <a class="dropdown-item" href="{{ route('debtor.create') }}">Send
                                                 Reminder</a> --}}
-                                            <form id="delete-form-{{ $response[$i]->_id }}" method="POST"
-                                                action="{{ route('customer.destroy', $response[$i]->_id) }}"
-                                                style="display:none">
-                                                {{csrf_field()}}
-                                                {{method_field('DELETE')}}
-                                            </form>
-                                            <a style="margin-left: 1.5rem;" class="text-danger" href="" onclick="
-                                                                        if(confirm('Are you sure You want to delete this user'))
-                                                                        {event.preventDefault(); document.getElementById('delete-form-{{ $response[$i]->_id }}').submit();}
-                                                                        else{
-                                                                        event.preventDefault();
-                                                                    }"> Delete </a>
+                                            @if(Cookie::get('user_role') == 'store_admin')
+                                                <form id="delete-form-{{ $customer->_id }}" method="POST"
+                                                    action="{{ route('customer.destroy', $customer->_id) }}"
+                                                    style="display:none">
+                                                    {{csrf_field()}}
+                                                    {{method_field('DELETE')}}
+                                                </form>
+                                                <a style="margin-left: 1.5rem;" class="text-danger" href="" onclick="
+                                                        if(confirm('Are you sure You want to delete this user'))
+                                                        {event.preventDefault(); document.getElementById('delete-form-{{ $customer->_id }}').submit();}
+                                                        else{
+                                                        event.preventDefault();
+                                                    }"> Delete </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
                                 </tr>
-                                @endfor
-
+                                @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -123,7 +134,7 @@
     </div>
 
 </div>
-
+@if(Cookie::get('user_role') != 'store_assistant')
 <div id="CustomerModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -193,6 +204,7 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div>
+@endif
 
 <div id="DebtModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -286,32 +298,60 @@
 
 @section("javascript")
 
-<script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+{{-- <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script> --}}
 <script src="/backend/assets/build/js/intlTelInput.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.3.1/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.js"></script>
 <script>
+    const export_filename = 'Mycustomers';
     $(document).ready(function () {
-        $('#basic-datatable').DataTable({
-            "pagingType": "full_numbers"
+        $('#customerTable').DataTable({
+            dom: 'frtipB',
+            buttons:[
+                {
+                    extend: 'excel',
+                    className: 'd-none',
+                    title: export_filename,
+                }, {
+                    extend: 'pdf',
+                    className: 'd-none',
+                    title: export_filename,
+                    extension: '.pdf'
+                }
+            ]
+        } );
+        $("#ExportReporttoExcel").on("click", function() {
+            $( '.buttons-excel' ).trigger('click');
+        });
+        $("#ExportReporttoPdf").on("click", function() {
+            $( '.buttons-pdf' ).trigger('click');
+        });
+
+        var input = document.querySelector("#phone");
+        var test = window.intlTelInput(input, {
+                // separateDialCode: true,
+            });
+
+            $("#phone").keyup(() => {
+                if ($("#phone").val().charAt(0) == 0) {
+                    $("#phone").val($("#phone").val().substring(1));
+                }
+            });
+
+        $("#submitForm").submit((e) => {
+            e.preventDefault();
+            const dialCode = test.getSelectedCountryData().dialCode;
+            if ($("#phone").val().charAt(0) == 0) {
+                $("#phone").val($("#phone").val().substring(1));
+            }
+            $("#phone_number").val(dialCode + $("#phone").val());
+            $("#submitForm").off('submit').submit();
         });
     });
 
-    var input = document.querySelector("#phone");
-    var test = window.intlTelInput(input, {
-        // any initialisation options go here
-    })
-
-    $("#submitForm").submit((e) => {
-        e.preventDefault();
-        const dialCode = test.getSelectedCountryData().dialCode;
-        if ($("#phone").val().charAt(0) == 0) {
-            $("#phone").val($("#phone").val().substring(1));
-        }
-        $("#phone_number").val(dialCode + $("#phone").val());
-        $("#submitForm").off('submit').submit();
-    });
-
 </script>
-{{-- @if (\Illuminate\Support\Facades\Cookie::get('is_first_time_user') == true) --}}
+{{-- @if ( Cookie::get('is_first_time_user') == true) --}}
 <script>
     var customer_intro_shown = localStorage.getItem('customer_intro_shown');
 
@@ -348,7 +388,6 @@
         tour.start();
         localStorage.setItem('customer_intro_shown', 1);
     }
-
 </script>
-{{-- @else --}}
+{{-- @endif --}}
 @stop

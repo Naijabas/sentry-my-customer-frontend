@@ -238,60 +238,36 @@ class AssistantController extends Controller
             $headers = ['headers' => ['x-access-token' => Cookie::get('api_token')]];
             $response = $client->request("GET", $url, $headers);
 
-            // First get the assistant details
-
             if ($response->getStatusCode() == 200) {
-                $assistant = json_decode($response->getBody());
-                $assistant = $assistant->data->store_assistant;
+                $data = json_decode($response->getBody());
+                $data = $data->data;
 
-                // Then get the store details
+                $data->_id = $data->user->_id;
+                $data->name = isset($data->user->first_name) ? $data->user->first_name : $data->user->name;
+                $data->phone_number = $data->user->phone_number;
+                $data->email = $data->user->email;
 
-                $url = env('API_URL', 'https://dev.api.customerpay.me') . '/store/' . $assistant->store_id;
-                $client = new Client();
-                $response = $client->request("GET", $url, $headers);
+                // dd($data);
+                return view('backend.assistant.show')->withData($data);
 
-                if ($response->getStatusCode() == 200) {
-                    $store = json_decode($response->getBody());
-                    $store = $store->data->store;
-
-                    // Finally get the transactions
-                    $url = env('API_URL', 'https://dev.api.customerpay.me') . '/transaction/store/' . $assistant->store_id;
-                    $client = new Client();
-                    $response = $client->request("GET", $url, $headers);
-
-                    if ($response->getStatusCode() == 200) {
-                        $transactions = json_decode($response->getBody());
-                        $transactions = $transactions->data->transactions;
-
-                        // get recent 10 transactions
-                        if (count($transactions) > 10) {
-                            $transactions = array_slice($transactions, 9);
-                        }
-
-                        return view('backend.assistant.show')->with('assistant', $assistant)->withStore($store)->withTransactions($transactions);
-
-                    } else {
-                        return back()->withErrors("An Error Occured. Please try again later");
-                    }
-
-
-                } else {
-                    return back()->withErrors("An Error Occured. Please try again later");
-                }
 
             } else {
-                return back()->withErrors("An Error Occured. Please try again later");
+                // return view('errors.500');
+                Session::flash('alert-class', 'alert-danger');
+                Session::flash('message', "An Error occured please try again later");
+                return back();
             }
 
 
         } catch (\Exception $e) {
             // dd($e->getCode());
             if ($e->getCode() == 401) {
-                return redirect()->route('logout')->withErrors("Please Login Again");
+                return redirect()->route('logout');
             }
             return view('errors.500');
             //return $response->getStatusCode();
         }
+
     }
 
     /**
@@ -333,7 +309,7 @@ class AssistantController extends Controller
 
                 if ($response->getStatusCode() == 200) {
                     // dd( $data->data->store_assistant);
-                    return view('backend.assistant.edit')->with('response', $data->data->store_assistant)->withStores($stores);
+                    return view('backend.assistant.edit')->with('response', $data->data->user)->withStores($stores);
 
                 } else {
                     return view('errors.500');
@@ -343,7 +319,7 @@ class AssistantController extends Controller
             }
 
         } catch (\Exception $e) {
-            //dd($e);
+              // dd($e);
             // dd($e->getCode());
             if ($e->getCode() == 401) {
                 return redirect()->route('logout')->withErrors("Please Login Again");
@@ -432,7 +408,7 @@ class AssistantController extends Controller
             if ($delete->getStatusCode() == 200 || $delete->getStatusCode() == 201) {
                 $request->session()->flash('alert-class', 'alert-success');
                 Session::flash('message', "Store assistant successfully deleted");
-                return back();
+                return redirect()->route('assistants.index');
             } else if ($delete->getStatusCode() == 401) {
                 $request->session()->flash('alert-class', 'alert-danger');
                 Session::flash('message', "You are not authorized to perform this action, please check your details properly");

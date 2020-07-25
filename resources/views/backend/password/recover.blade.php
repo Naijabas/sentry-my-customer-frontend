@@ -113,7 +113,6 @@
         }
         $("#phone_number").val(dialCode + $("#phone").val());
         $("#submitForm").off('submit').submit();
-
     });
 
 </script>

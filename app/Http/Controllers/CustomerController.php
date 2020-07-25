@@ -4,14 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use Illuminate\Pagination\LengthAwarePaginator as Paginator; // NAMESPACE FOR PAGINATOR
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Exception;
+use GuzzleHttp\Exception\RequestException;
 
 // FOR COUNTRY CODE AND PHONE NUMBER IMPLEMENTATION
 use App\Rules\DoNotPutCountryCode;
 use App\Rules\NoZero;
+use stdClass;
 
 class CustomerController extends Controller
 {
@@ -29,13 +31,17 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( Request $request )
+    public function index(Request $request)
     {
-        //
+        if (Cookie::get('user_role') == 'super_admin') {
+            $url = $this->host . '/customer/all';
+            $store_url = $this->host . '/store/all';
+        } else {
+            $url = $this->host . '/customer';
+            $store_url = $this->host . '/store';
+        }
+
         try {
-            $id = Cookie::get('user_id');
-            $url = $this->host.'/customer' ;
-            $store_url = $this->host.'/store' ;
             $client = new Client();
 
             $headers = ['headers' => ['x-access-token' => Cookie::get('api_token')]];
@@ -44,63 +50,70 @@ class CustomerController extends Controller
 
             $statusCode = $user_response->getStatusCode();
             $statusCode2 = $store_response->getStatusCode();
-            $users = json_decode($user_response->getBody());
-            $stores = json_decode($store_response->getBody());
 
-            if ( $statusCode == 200 && $statusCode2 == 200 ) {
-                $customerArray = [];
-                $store_ids = [];
-                $store_names = [];
-                foreach($users->data->customer as $key => $value) {
-                    array_push($customerArray, $users->data->customer[$key]->customers);
-                    array_push($store_ids, $users->data->customer[$key]->storeId);
-                    array_push($store_names, $users->data->customer[$key]->storeName);
-                }
+            if ($statusCode == 200 && $statusCode2 == 200) {
 
+                $stores = json_decode($store_response->getBody())->data->stores;
                 $allCustomers = [];
-                foreach( $customerArray as $key => $value ) {
-                    foreach( $value as $k => $val ) {
-                        $val->store_id = $store_ids[$key];
-                        $val->store_name = $store_names[$key];
-                        array_push($allCustomers, $val);
+
+                if (Cookie::get('user_role') == 'super_admin') {
+                    $userData = json_decode($user_response->getBody())->data->customers;
+                    $_stores = [];
+                    foreach ($stores as $adminStores) {
+                        foreach ($adminStores as $store) {
+                            foreach ($store->customers as $customer) {
+                                $customer->store_name = $store->store_name;
+                                $customer->store_id  = $store->_id;
+                                $allCustomers[] = $customer;
+                            }
+                            $_stores[] = $store;
+                        }
+                    }
+                    $stores = $_stores;
+                } else {
+                    $userData = json_decode($user_response->getBody())->data->customer;
+                    foreach ($userData as $store) {
+                        foreach ($store->customers as $customer) {
+                            $customer->store_name = $store->storeName;
+                            $customer->store_id  = $store->storeId;
+                            $allCustomers[] = $customer;
+                        }
                     }
                 }
-
-                // start pagination
-                // $perPage = 5;
-                // $page = $request->get('page', 1);
-                // if ($page > count($allCustomers) or $page < 1) {
-                //     $page = 1;
-                // }
-                // $offset = ($page * $perPage) - $perPage;
-                // $articles = array_slice($allCustomers, $offset, $perPage);
-                // $datas = new Paginator($articles, count($allCustomers), $perPage);
-
-                $stores = $stores->data->stores;
-
                 return view('backend.customer.index')->with(['response' => $allCustomers, 'stores' => $stores]);
-                // return view('backend.customer.index')->with(['response' => $datas->withPath('/'.$request->path()), 'stores' => $stores]);
             }
+            $request->session()->flash('message', $user_response . '<br>' . $store_response);
+            $allCustomers = [];
+            $stores = [];
+            return view('backend.customer.index')->with(['response' => $allCustomers, 'stores' => $stores]);
+        } catch (RequestException $e) {
+            Log::info('Catch error: CustomerController - ' . $e->getMessage());
 
-            if ( $statusCode == 500 ) {
-                return view('errors.500');
-            }
-        } catch(\RequestException $e) {
-            $statusCode = $e->getResponse()->getStatusCode();
-            $data = json_decode($e->getResponse()->getBody()->getContents());
-            if ( $statusCode == 401 ) { //401 is error code for invalid token
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
                 return redirect()->route('logout');
             }
 
-            return view('errors.500');
-        } catch ( \Exception $e ) {
-            if ( $e->hasResponse() ) {
-                $statusCode = $e->getResponse()->getStatusCode();
-                $data = json_decode($e->getResponse()->getBody()->getContents());
-                if ( $statusCode == 401 ) { //401 is error code for invalid token
-                    return redirect()->route('logout');
-                }
-            }        
+            // get response to catch 4 errors
+            if ($e->hasResponse()) {
+                $response = $e->getResponse()->getBody();
+                $result = json_decode($response);
+                Session::flash('message', $result->message);
+                $response = [];
+                $stores = [];
+                return view('backend.customer.index',  compact('response', 'stores'));
+            }
+            return view('backend.customer.show')->with('errors.500');
+        } catch (Exception $e) {
+            // token expired
+            dd($e->getMessage());
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
+                return redirect()->route('logout');
+            }
+
+            Log::error('Catch error: CustomerController - ' . $e->getMessage());
             return view('errors.500');
         }
     }
@@ -125,7 +138,7 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         //
-        $url = $this->host.'/customer/new/';
+        $url = $this->host . '/customer/new/';
 
         if ($request->isMethod('post')) {
             $request->validate([
@@ -160,30 +173,35 @@ class CustomerController extends Controller
                     Session::flash('message', $data->message);
                     return redirect()->view('backend.customer.create');
                 }
-            } catch (\RequestException $e) {
-                $statusCode = $e->getResponse()->getStatusCode();
-                $data = json_decode($e->getResponse()->getBody()->getContents());
-                $request->session()->flash('message', isset($data->message) ? $data->message : $data->error->error);
-                if ( $statusCode == 401 ) {
+            } catch (RequestException $e) {
+                Log::info('Catch error: CustomerController - ' . $e->getMessage());
+
+                // token expired
+                if ($e->getCode() == 401) {
+                    Session::flash('message', 'session expired');
                     return redirect()->route('logout');
                 }
+
+                // get response to catch 4 errors
+                if ($e->hasResponse()) {
+                    $response = $e->getResponse()->getBody();
+                    $result = json_decode($response);
+                    $message = isset($result->message) ? $result->message : (isset($result->Message) ? $result->Message : $result->error->error);
+                    Session::flash('message', $message);
+                }
+
                 return back();
-                Log::error((string) $response->getBody());
-                return view('errors.500');
-            } catch ( \Exception $e ) {
-                $statusCode = $e->getResponse()->getStatusCode();
-                $data = json_decode($e->getResponse()->getBody()->getContents());
-                $request->session()->flash('message', isset($data->message) ? $data->message : $data->error->error);
-                if ( $statusCode == 401 ) {
+            } catch (Exception $e) {
+                // token expired
+                if ($e->getCode() == 401) {
+                    Session::flash('message', 'session expired');
                     return redirect()->route('logout');
                 }
-                return back();
-                Log::error((string) $response->getBody());
+
+                Log::error('Catch error: CustomerController - ' . $e->getMessage());
                 return view('errors.500');
             }
         }
-
-        return view('backend.customer.index');
     }
 
     /**
@@ -196,43 +214,57 @@ class CustomerController extends Controller
     public function show($id)
     {
         // return view('backend.customer.show');
-        if ( !$id || empty($id) ) {
+        if (!$id || empty($id)) {
             return view('errors.500');
         }
 
         $store_id = explode('-', $id)[0];
         $customer_id = explode('-', $id)[1];
 
+        if (Cookie::get('user_role') == 'super_admin') {
+            $url = $this->host . "/customer/admin/" . $store_id . "/" . $customer_id;
+        } else {
+            $url = $this->host . "/customer/" . $store_id . "/" . $customer_id;
+        }
+
         try {
-            $url = $this->host."/customer/".$store_id."/".$customer_id;
             $client = new Client;
             $headers = ['headers' => ['x-access-token' => Cookie::get('api_token')]];
             $response = $client->request("GET", $url, $headers);
-            $data = json_decode($response->getBody());
-            if ( $response->getStatusCode() == 200 ) {
-                return view('backend.customer.show')->with('response', $data->data);
+            $customer = json_decode($response->getBody())->data;
+            if ($response->getStatusCode() == 200) {
+                $result = $this->calculations($customer);
+                $chartData = $this->chartData($customer);
+                return view('backend.customer.show', compact('customer', 'result', 'chartData'));
             } else {
                 return view('errors.500');
             }
-        } catch (\RequestException $e) {
-            $statusCode = $e->getResponse()->getStatusCode();
-            $data = json_decode($e->getResponse()->getBody()->getContents());
-            $request->session()->flash('message', isset($data->message) ? $data->message : $data->error->error);
-            if ( $statusCode == 401 ) {
+        } catch (RequestException $e) {
+            Log::info('Catch error: CustomerController - ' . $e->getMessage());
+
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
                 return redirect()->route('logout');
             }
+
+            // get response to catch 4 errors
+            if ($e->hasResponse()) {
+                $response = $e->getResponse()->getBody();
+                $result = json_decode($response);
+                $message = isset($result->message) ? $result->message : (isset($result->Message) ? $result->Message : $result->error->error);
+                Session::flash('message', $message);
+            }
+
             return back();
-            Log::error((string) $response->getBody());
-            return view('errors.500');
-        } catch ( \Exception $e ) {
-            $statusCode = $e->getResponse()->getStatusCode();
-            $data = json_decode($e->getResponse()->getBody()->getContents());
-            $request->session()->flash('message', isset($data->message) ? $data->message : $data->error->error);
-            if ( $statusCode == 401 ) {
+        } catch (Exception $e) {
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
                 return redirect()->route('logout');
             }
-            return back();
-            Log::error((string) $response->getBody());
+
+            Log::error('Catch error: CustomerController - ' . $e->getMessage());
             return view('errors.500');
         }
     }
@@ -245,17 +277,16 @@ class CustomerController extends Controller
      */
     public function edit($id)
     {
-        //
-        if ( !$id || empty($id) ) {
-            return redirect()-route('logout');
+        if (!$id || empty($id)) {
+            return back();
         }
 
         $store_id = explode('-', $id)[0];
         $customer_id = explode('-', $id)[1];
 
         try {
-            $url = $this->host."/customer/".$store_id."/".$customer_id;
-            $store_url = $this->host.'/store';
+            $url = $this->host . "/customer/" . $store_id . "/" . $customer_id;
+            $store_url = $this->host . '/store';
             $client = new Client;
             $headers = ['headers' => ['x-access-token' => Cookie::get('api_token')]];
 
@@ -264,32 +295,39 @@ class CustomerController extends Controller
 
             $data = json_decode($response->getBody());
             $stores = json_decode($store_response->getBody());
-            if ( $response->getStatusCode() == 200 && $store_response->getStatusCode() == 200 ) {
+            if ($response->getStatusCode() == 200 && $store_response->getStatusCode() == 200) {
                 $stores = $stores->data->stores;
                 return view('backend.customer.edit')->with(['response' => $data->data, 'stores' => $stores]);
             } else {
                 Session::flash('message', "Error occured; can't fetch customer's details at the moment");
                 return back();
             }
-        } catch (\RequestException $e) {
-            $statusCode = $e->getResponse()->getStatusCode();
-            $data = json_decode($e->getResponse()->getBody()->getContents());
-            $request->session()->flash('message', isset($data->message) ? $data->message : $data->error->error);
-            if ( $statusCode == 401 ) {
+        } catch (RequestException $e) {
+            Log::info('Catch error: CustomerController - ' . $e->getMessage());
+
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
                 return redirect()->route('logout');
             }
+
+            // get response to catch 4 errors
+            if ($e->hasResponse()) {
+                $response = $e->getResponse()->getBody();
+                $result = json_decode($response);
+                $message = isset($result->message) ? $result->message : (isset($result->Message) ? $result->Message : $result->error->error);
+                Session::flash('message', $message);
+            }
+
             return back();
-            Log::error((string) $response->getBody());
-            return view('errors.500');
-        } catch ( \Exception $e ) {
-            $statusCode = $e->getResponse()->getStatusCode();
-            $data = json_decode($e->getResponse()->getBody()->getContents());
-            Session::flash('message', isset($data->message) ? $data->message : $data->error->error);
-            if ( $statusCode == 401 ) {
+        } catch (Exception $e) {
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
                 return redirect()->route('logout');
             }
-            return back();
-            Log::error((string) $response->getBody());
+
+            Log::error('Catch error: CustomerController - ' . $e->getMessage());
             return view('errors.500');
         }
     }
@@ -313,7 +351,7 @@ class CustomerController extends Controller
         $customer_id = explode('-', $id)[1];
 
         try {
-            $url = $this->host.'/customer/update/'.$customer_id;
+            $url = $this->host . '/customer/update/' . $customer_id;
 
             $client = new Client();
 
@@ -330,7 +368,7 @@ class CustomerController extends Controller
 
             $data = json_decode($response->getBody());
 
-            if ( $response->getStatusCode() == 200 ) {
+            if ($response->getStatusCode() == 200) {
                 $request->session()->flash('alert-class', 'alert-success');
                 $request->session()->flash('message', 'Customer updated successfully');
 
@@ -339,13 +377,33 @@ class CustomerController extends Controller
                 $request->session()->flash('alert-class', 'alert-danger');
                 $request->session()->flash('message', 'Customer update failed');
             }
+        } catch (RequestException $e) {
+            Log::info('Catch error: CustomerController - ' . $e->getMessage());
 
-        } catch ( \Exception $e ) {
-            $data = json_decode($e->getresponse()->getBody()->getContents());
-            $request->session()->flash('alert-class', 'alert-danger');
-            $request->session()->flash('message', $data->message);
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
+                return redirect()->route('logout');
+            }
+
+            // get response to catch 4 errors
+            if ($e->hasResponse()) {
+                $response = $e->getResponse()->getBody();
+                $result = json_decode($response);
+                $message = isset($result->message) ? $result->message : (isset($result->Message) ? $result->Message : $result->error->error);
+                Session::flash('message', $message);
+            }
 
             return redirect()->back();
+        } catch (Exception $e) {
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
+                return redirect()->route('logout');
+            }
+
+            Log::error('Catch error: CustomerController - ' . $e->getMessage());
+            return view('errors.500');
         }
     }
 
@@ -359,7 +417,7 @@ class CustomerController extends Controller
     {
         //
         try {
-            $url = $this->host.'/customer/delete/'.$id;
+            $url = $this->host . '/customer/delete/' . $id;
 
             $client = new Client();
 
@@ -372,7 +430,7 @@ class CustomerController extends Controller
 
             $data = json_decode($response->getBody());
 
-            if ( $response->getStatusCode() == 200 ) {
+            if ($response->getStatusCode() == 200) {
                 $request->session()->flash('alert-class', 'alert-success');
                 $request->session()->flash('message', 'Customer deleted successfully');
 
@@ -381,13 +439,76 @@ class CustomerController extends Controller
                 $request->session()->flash('alert-class', 'alert-danger');
                 $request->session()->flash('message', 'Customer deleting failed');
             }
+        } catch (RequestException $e) {
+            Log::info('Catch error: CustomerController - ' . $e->getMessage());
 
-        } catch ( \Exception $e ) {
-            $data = json_decode($e->getBody()->getContents());
-            $request->session()->flash('alert-class', 'alert-danger');
-            $request->session()->flash('message', $data->message);
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
+                return redirect()->route('logout');
+            }
+
+            // get response to catch 4 errors
+            if ($e->hasResponse()) {
+                $response = $e->getResponse()->getBody();
+                $result = json_decode($response);
+                $message = isset($result->message) ? $result->message : (isset($result->Message) ? $result->Message : $result->error->error);
+                Session::flash('message', $message);
+            }
 
             return redirect()->back();
+        } catch (Exception $e) {
+            // token expired
+            if ($e->getCode() == 401) {
+                Session::flash('message', 'session expired');
+                return redirect()->route('logout');
+            }
+
+            Log::error('Catch error: CustomerController - ' . $e->getMessage());
+            return view('errors.500');
         }
     }
+
+    public function calculations($data)
+    {
+        $transactions = $data->customer->transactions;
+        $result = new stdClass;
+        $result->total_revenue = 0;
+        $result->total_debt = 0;
+        $result->total_receivables = 0;
+        $result->transactions = 0;
+
+        foreach ($transactions as $trensaction) {
+            if ($trensaction->type == 'debt') {
+                $result->total_debt += $trensaction->amount + ($trensaction->amount * $trensaction->interest);
+            } elseif ($trensaction->type == 'paid') {
+                $result->total_revenue += $trensaction->amount;
+            } else {
+                $result->total_receivables += $trensaction->amount;
+            }
+            $result->transactions += 1;
+        }
+
+        return $result;
+    }
+
+    public function chartData($data)
+    {
+        $transactions = $data->customer->transactions;
+        $result = [];
+
+        if (count($transactions) < 2) {
+            $_transactions['y'] = 0;
+            $_transactions['x'] = date('D, d M Y H:i:s');
+            $result[] = $_transactions;
+        }
+
+        foreach ($transactions as $trensaction) {
+            $_transactions['y'] = $trensaction->amount;
+            $_transactions['x'] = $trensaction->createdAt;
+            $result[] = $_transactions;
+        }
+        return $result;
+    }
+
 }

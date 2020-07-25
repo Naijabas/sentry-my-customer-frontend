@@ -92,7 +92,7 @@
                         </div>
                     </div>
 
-                    {{-- <div class="col-xl-6">
+                    <div class="col-xl-6">
                         <div class="card">
                             <div class="card-body pt-2">
                                 <div class="dropdown mt-2 float-right">
@@ -109,84 +109,149 @@
                                 </div>
                                 <h5 class="mb-4 header-title">Recent Conversation</h5>
                                 <div class="chat-conversation">
-                                    <ul class="conversation-list slimscroll" style="max-height: 328px;">
-                                        <li class="clearfix">
-                                            <div class="chat-avatar">
-                                                <img src="/backend/assets/images/users/default.png" alt="Female" />
-                                                <i>10:00</i>
-                                            </div>
-                                            <div class="conversation-text">
-                                                <div class="ctext-wrap">
-                                                    <i>Greeva</i>
-                                                    <p>
-                                                        Hello!
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="clearfix odd">
-                                            <div class="chat-avatar">
-                                                <img src="/backend/assets/images/users/default.png" alt="Male" />
-                                                <i>10:01</i>
-                                            </div>
-                                            <div class="conversation-text">
-                                                <div class="ctext-wrap">
-                                                    <i>Shreyu</i>
-                                                    <p>
-                                                        Hi, How are you? What about our next meeting?
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="clearfix">
-                                            <div class="chat-avatar">
-                                                <img src="/backend/assets/images/users/default.png" alt="female" />
-                                                <i>10:01</i>
-                                            </div>
-                                            <div class="conversation-text">
-                                                <div class="ctext-wrap">
-                                                    <i>Greeva</i>
-                                                    <p>
-                                                        Yeah everything is fine
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li class="clearfix odd">
-                                            <div class="chat-avatar">
-                                                <img src="/backend/assets/images/users/default.png" alt="male" />
-                                                <i>10:02</i>
-                                            </div>
-                                            <div class="conversation-text">
-                                                <div class="ctext-wrap">
-                                                    <i>Shreyu</i>
-                                                    <p>
-                                                        Awesome! let me know if we can talk in 20 min
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
+                                    <ul class="conversation-list slimscroll" style="max-height: 328px;" id="chat_message_body">
+                                        <div class="card-body p-5 card" id="loading_card">
+                                            <h4 class="text-center">Loading ...</h4>
+                                        </div>
                                     </ul>
-                                    <form class="needs-validation" novalidate name="chat-form" id="chat-form">
+                                    <form novalidate action="javascript:void(0);">
                                         <div class="row">
                                             <div class="col">
-                                                <input type="text" class="form-control chat-input" placeholder="Enter your text" required />
-                                                <div class="invalid-feedback">
-                                                    Please enter your messsage
-                                                </div>
+                                                <input type="text" class="form-control" placeholder="Enter your text" id="chat_msg_send" />
+                                                <div class="invalid-feedback"></div>
                                             </div>
                                             <div class="col-auto">
-                                                <button type="submit" class="btn btn-danger chat-send btn-block waves-effect waves-light">Send</button>
+                                                <button type="submit" class="btn btn-danger btn-block" onclick="add_feedback()">Send</button>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
 
                 </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('javascript')
+    <script>
+        $().ready(function () {
+            get_feedback();
+        });
+
+        function get_feedback()
+        {
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "{{ env('API_URL', 'https://dev.api.customerpay.me') }}/complaint/feedbacks/{{ $response->data->complaint->_id }}",
+                    type: "GET",
+                    headers: {
+                        "x-access-token" : "{{ \Cookie::get('api_token') }}",
+                    },
+                    success: function (result) {
+
+                        $('#loading_card').remove();
+                        $('#no_feedback').remove();
+
+                        if(result.data.feedbacks.length != 0){
+
+                            var feedback_history_array = result.data.feedbacks;
+
+                            var messages_gotten;
+
+                            for (var i = 0; i < feedback_history_array.length; i++) {
+                                if ( feedback_history_array[i].userRole != "super_admin" ){
+                                    messages_gotten += `
+                                        <li class="clearfix odd">
+                                            {{-- <div class="chat-avatar">
+                                                <img src="/backend/assets/images/users/default.png">
+                                                <i>10:01</i>
+                                            </div> --}}
+                                            <div class="conversation-text">
+                                                <div class="ctext-wrap">
+                                                    <i>You</i>
+                                                    <p>
+                                                        `+ feedback_history_array[i].messages +`
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    `;
+                                } else {
+                                    messages_gotten += `
+                                        <li class="clearfix">
+                                            {{-- <div class="chat-avatar">
+                                                <img src="/backend/assets/images/users/default.png">
+                                                <i>10:01</i>
+                                            </div> --}}
+                                            <div class="conversation-text">
+                                                <div class="ctext-wrap">
+                                                    <i>Super Admin</i>
+                                                    <p>
+                                                        `+ feedback_history_array[i].messages +`
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    `;
+                                }
+                            }
+
+                            $("#chat_message_body").html(messages_gotten);
+
+                        } else {
+
+                            $("#chat_message_body").html(`
+                                <div class="card-body p-5 card" id="no_feedback">
+                                    <h4 class="text-center">No feedbacks yet ...</h4>
+                                </div>
+                            `);
+                        }
+                        // Get Latest Messages
+                        get_feedback();
+                    },
+                    error: function () {
+
+                        // Retry getting latest messages
+                        get_feedback();
+                    }});
+            }, 3000);
+        }
+
+        function add_feedback()
+        {
+            if( $('#chat_msg_send').val().trim() != "" ){
+                var feedback_msg = $('#chat_msg_send').val().trim();
+                $.ajax({
+                    url: "{{ env('API_URL', 'https://dev.api.customerpay.me') }}/complaint/feedback/{{ $response->data->complaint->_id }}",
+                    type: "post",
+                    headers: {
+                        "x-access-token" : "{{ \Cookie::get('api_token') }}",
+                    },
+                    data: {
+                        messages: feedback_msg
+                    },
+                    success: function (result) {
+
+                        $('#loading_card').remove();
+                        $('#no_feedback').remove();
+                        $('#chat_msg_send').val("");
+                        $(".invalid-feedback").hide()
+                    },
+                    error: function () {
+
+                        $(".invalid-feedback").show();
+                        $(".invalid-feedback").html('Error sending message. Check Internet and retry.');
+                    }
+                });
+            } else {
+
+                $(".invalid-feedback").show();
+                $(".invalid-feedback").html('Please enter your messsage');
+            }
+        }
+    </script>
 @endsection

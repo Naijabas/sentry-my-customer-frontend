@@ -1,0 +1,107 @@
+
+.container{
+    width: 591px;
+    height: 342px;
+    background: #E7F0FA;
+
+    /* background-image: url("../img/bg-left.png"), url("../img/bg-right.png"); */
+    background-position:left bottom, right bottom;
+    background-repeat: no-repeat, no-repeat;
+}
+
+.text{
+    padding-top: 23px;
+    padding-left: 101px;
+}
+
+/* @font-face {
+    font-family: Gilroy-Bold;
+    src: url("../fonts/Gilroy-Bold.ttf");
+}
+@font-face {
+    font-family: Gilroy;
+    src: url("../fonts/Gilroy-Regular.ttf");
+}
+@font-face {
+    font-family: Gilroy-Medium;
+    src: url("../fonts/Gilroy-Medium.ttf");
+} */
+  
+
+.hh1{
+    font-family: Gilroy-Bold;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 14px;
+    /* or 78% */
+    letter-spacing: -0.02em;
+    color: #191919;
+}
+.hh2{
+    font-family: Gilroy;
+    font-size: 14px;
+    line-height: 14px;
+    color: rgba(0, 0, 0, 0.9);
+    font-style: normal;
+    font-weight: normal;
+    margin-top: -22px;
+}
+.hh3{
+    font-family: 'Bad Script', cursive;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 36px;
+    line-height: 6px;
+    letter-spacing: -0.02em;
+    color: #333333;
+    padding-top: 40px;
+}
+.hh4{
+    font-family: Gilroy-Medium;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 11px;
+    line-height: 14px;
+    color: rgba(0, 0, 0, 0.49);
+    margin-top: -10px;
+}
+.hh5{
+    font-family: Gilroy;
+    font-size: 14px;
+    line-height: 14px;
+    letter-spacing: -0.02em;
+    color: #191919;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: -5px;
+}
+.hh6{
+    font-family: Gilroy;
+    font-size: 14px;
+    line-height: 14px;
+    letter-spacing: -0.02em;
+    color: #191919;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: -12px;
+}
+.hh7{
+    font-family: Gilroy-Medium;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.02em;
+    color: #191919;
+    width: 250px;
+    padding-top: 20px;
+}
+
+
+
+
+
+
+
+

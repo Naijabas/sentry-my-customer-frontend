@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Rules\DoNotAddIndianCountryCode;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Cookie;
 use GuzzleHttp\Client;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Exception\RequestException;
 use App\Rules\NoZero;
 use App\Rules\DoNotPutCountryCode;
+use Symfony\Component\Console\Input\Input;
 
 class RegisterController extends Controller
 {
@@ -66,7 +68,7 @@ class RegisterController extends Controller
     {
 
         $data = $request->validate([
-            'phone_number' => ['required', 'min:6', 'max:16', new NoZero, new DoNotPutCountryCode],
+            'phone_number' => ['required', 'min:6', 'max:16', new DoNotAddIndianCountryCode, new DoNotPutCountryCode],
             'password' => ['required', 'min:6']
         ]);
 
@@ -93,7 +95,7 @@ class RegisterController extends Controller
 
                         $data = $res->data->user->local;
                         $api_token = $res->data->user->api_token;
-                        $user_role = $res->data->user->user_role;
+                        $user_role = $res->data->user->local->user_role;
 
                         // store data to cookie
                         Cookie::queue('user_role', $user_role);
@@ -101,8 +103,10 @@ class RegisterController extends Controller
                         Cookie::queue('is_active', $data->is_active);
                         Cookie::queue('phone_number', $data->phone_number);
                         Cookie::queue('user_id', $res->data->user->_id);
-                        Cookie::queue('expires', strtotime('+ 1 hour'));
-                        Cookie::queue('is_first_time_user', true);
+                        Cookie::queue('expires', strtotime('+ 1 day'));
+
+                        // Set is first timer so intros can show
+                        Cookie::queue('is_first_time_user' , true);
 
                         return redirect()->route('activate.index');
                     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Rules\DoNotAddIndianCountryCode;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Validator;
@@ -62,7 +63,7 @@ class ForgotPasswordController extends Controller
                     $request->session()->flash('message', 'kindly check your Phone for verification code');
                     return view('backend.password.reset', [
                         'data' => $data,
-                        'phoneNumber' => $request->input('phone_number'),
+                        'phoneNumber' => $request->input('phone_number'), 
                     ]);
                 } else {
                     $message = $response->message;

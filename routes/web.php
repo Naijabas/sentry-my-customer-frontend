@@ -3,6 +3,8 @@
 use App\Events\UserRegistered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Crypt;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,20 +49,10 @@ Route::get('/admin', function () {
     return redirect()->route('dashboard');
 });
 
-// Store Assistant Access 
-Route::prefix('/assistant')->group(function () {
-    Route::get('/login', ['uses' => "Auth\LoginController@assistant"])->name('login.assistant');
-    Route::post('/authenticate', ['uses' => "Auth\LoginController@authenticateAssistant"])->name('assistant.authenticate');
-   
-    Route::group(['middleware' => ['backend.auth', 'store.assistant']], function () {
-        // Route::get('/dashboard', 'DashboardController@index')->name('dashboard.assistant');
-
-    });
-});
-
 // backend codes
 Route::prefix('/admin')->group(function () {
 
+    // ------------ AUTH ROUTES ------------------------ //
     // auth routes
     Route::get('/login', ['uses' => "Auth\LoginController@index"])->name('login');
 
@@ -72,17 +64,86 @@ Route::prefix('/admin')->group(function () {
 
     Route::get('/logout', 'Auth\LogoutController@index')->name('logout');
 
+    Route::get('/card_v1', "BusinessCard@card_v1");
+    Route::get('/card_v2', 'BusinessCard@card_v2');
+
     Route::get('/password', 'Auth\ForgotPasswordController@index')->name('password');
     Route::post('/password', 'Auth\ForgotPasswordController@authenticate')->name('password.reset');
 
     Route::post('/password/reset', 'Auth\ResetPasswordController@index')->name('password.recover');
 
+    // activation
+    Route::get('/activate', 'ActivateController@index')->name('activate.index');
+    Route::post('/activate', 'ActivateController@activate')->name('activate.save');
 
+    // ------------ AUTH ROUTES ENDS HERE ------------------------ //
+
+    // ------------ ADMIN ROUTES ------------------------ //
     Route::group(['middleware' => 'backend.auth'], function () {
 
-        // activation
-        Route::get('/activate', 'ActivateController@index')->name('activate.index');
-        Route::post('/activate', 'ActivateController@activate')->name('activate.save');
+        $user_role = Cookie::get('user_role'); // using this for now till middleware issue is fixed
+        $user_role = $user_role ? Crypt::decrypt($user_role, false) : '';
+        // dd($user_role);
+
+        // ------------ SUPER ADMIN PROTECTED ROUTES ------------------------ //
+        if ($user_role == 'super_admin') {
+
+            // Route::group(['middleware' => 'backend.super.admin'], function () {
+            // user crud
+            Route::resource('users', 'UsersController');
+
+            // assistant crud
+            Route::resource('assistants', 'AssistantController');
+
+            // store crud
+            Route::resource('store', 'StoreController');
+
+            // complaint crud
+            Route::resource('complaint', 'ComplaintController');
+
+            // customer crud
+            Route::resource('customer', 'CustomerController');
+            // });
+        }
+        // ------------ SUPER ADMIN PROTECTED ROUTES ENDS HERE------------------------ //
+
+
+        // ------------ STORE ADMIN PROTECTED ROUTES ------------------------
+        if ($user_role == 'store_admin') {
+            //  Route::group(['middleware' => 'backend.store.admin'], function () {
+            // assistant crud
+            Route::resource('assistants', 'AssistantController');
+
+            // store crud
+            Route::resource('store', 'StoreController');
+
+            // complaint crud
+            Route::resource('complaint', 'ComplaintController')->only(['index', 'show', 'store', 'create']);
+
+            // customer crud
+            Route::resource('customer', 'CustomerController');
+            //  });
+        }
+
+        // ------------ STORE ADMIN PROTECTED ROUTES ENDS HERE------------------------ //
+
+
+        // ------------ STORE ASSISTANT PROTECTED ROUTES ------------------------ //
+        if ($user_role == 'store_assistant') {
+            //Route::group(['middleware' => 'backend.store.assistant'], function () {
+
+            Route::resource('complaint', 'ComplaintController')->only(['index', 'create', 'store', 'show']);
+
+            // customer crud
+            Route::resource('customer', 'CustomerController')->only(['index', 'show']);
+
+            // });
+        }
+        // ------------ STORE ADMIN PROTECTED ROUTES ENDS HERE------------------------ //
+
+
+        // ----------- GENERAL ROUTES FOR SUPER ADMIN, STORE ADMIN AND STORE ASSISTANT-------------- //
+
 
         // dashboard, creditor, debtor
         Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
@@ -96,8 +157,6 @@ Route::prefix('/admin')->group(function () {
         //reminder
         Route::post('/reminder/email', 'ReminderController@sendViaEmail');
 
-        // customer crud
-        Route::resource('customer', 'CustomerController');
 
         // debtor crud
         Route::resource('debtor', 'DebtorController');
@@ -114,20 +173,10 @@ Route::prefix('/admin')->group(function () {
         // transaction crud
         Route::resource('transaction', 'TransactionController');
 
-        // store crud
-        Route::resource('store', 'StoreController');
-
-        // assistant crud
-        Route::resource('assistants', 'AssistantController');
 
         // broadcast crud
         Route::resource('broadcast', 'BroadcastController');
 
-        // complaint crud
-        Route::resource('complaint', 'ComplaintController');
-
-        // user crud
-        Route::resource('users', 'UsersController');
 
         // location
         Route::resource('location', 'LocationController');
@@ -138,216 +187,17 @@ Route::prefix('/admin')->group(function () {
             return redirect('/admin/debtor/create');
         })->name('debts.reminder');
 
-        Route::get('debt.search','DebtorController@search')->name('debt.search');
+        // Route::get('debt.search', 'DebtorController@search')->name('debt.search');
 
-        Route::post('reminder', 'DebtorController@sendReminder')->name('reminder');
+        Route::post('reminder/{id}', 'DebtorController@sendReminder')->name('reminder');
 
         Route::post('schedule-reminder', 'DebtorController@sheduleReminder')->name('schedule-reminder');
 
         Route::get('markpaid/{id}', 'DebtorController@markPaid')->name('markpaid');
 
-        // super admin protected routes
-        Route::group(['middleware' => 'backend.super.admin'], function () {
-            // Route::get('/users', 'UsersController@index')->name('users');
-            // Route::get('/users/{id}', 'UsersController@show')->name('user.view');
-        });
+        Route::get('store_debt/{id}', 'StoreController@debt')->name('store_debt');
     });
+    // ------------ GENERAL ROUTES ENDS HERE ------------------------ //
+
+    // ------------ ADMIN ROUTES ENDS HERE ------------------------ //
 });
-
-
-    // Route::get('/backend/transactions', function () {
-    //     return view('backend.transactions.index');
-    // });
-
-
-// Protected Routes
-// Route::group(['prefix' => '/admin'], function () {
-//     Route::get('/activate', 'ActivateController@index')->name('activate.index');
-
-// // dashboard
-// Route::get('/dashboard', function () {
-//     return view('backend.dashboard.index');
-// })->name('dashboard');
-
-// // Single Transaction Page
-// Route::get('/s-transaction', function () {
-//     return view('backend.transactions.s-transaction');
-// });
-// Route::group(['prefix' => '/admin' , 'middleware' => 'backend.auth'], function () {
-//     Route::get('/activate', 'ActivateController@index')->name('activate.index');
-
-//     // dashboard
-//     Route::get('/dashboard', function () {
-//         return view('backend.dashboard');
-//     })->name('dashboard');
-
-//     // Customers
-//     Route::get('/customers', function () {
-//         return view('backend.customers.index');
-//     })->name('customers');
-
-// Protected Routes
-// Route::group(['prefix' => '/admin'], function () {
-//     Route::get('/activate', 'ActivateController@index')->name('activate.index');
-
-// // dashboard
-// Route::get('/dashboard', function () {
-//     return view('backend.dashboard.index');
-// })->name('dashboard');
-
-// // Single Transaction Page
-// Route::get('/s-transaction', function () {
-//     return view('backend.transactions.s-transaction');
-// });
-// Route::group(['prefix' => '/admin' , 'middleware' => 'backend.auth'], function () {
-//     Route::get('/activate', 'ActivateController@index')->name('activate.index');
-
-//     // dashboard
-//     Route::get('/dashboard', function () {
-//         return view('backend.dashboard');
-//     })->name('dashboard');
-
-//     // Customers
-//     Route::get('/customers', function () {
-//         return view('backend.customers.index');
-//     })->name('customers');
-
-//Single Customer view
-
-//     Route::get('/singleCustomer/{customer_id}', 'CustomerController@viewCustomer')->name('customer.view');
-
-//     Route::get('/edit_customer/{customer_id}', 'CustomerController@edit');
-
-//     Route::post('/edit_customer/{customer_id}', 'CustomerController@update')->name('customer.update');
-// });
-
-//     // Single Transaction Page
-//     Route::get('/s-transaction', function () {
-//         return view('backend.transactions.s-transaction');
-//     });
-
-//     // Creditors
-//     Route::get('/creditor/add', function () {
-//         return view('backend.creditors.add');
-//     })->name('add_creditor');
-
-//     // Debtors
-//     Route::get('/debtor/add', function () {
-//         return view('backend.debtors.add');
-//     })->name('add_debtor');
-
-//     //Single Customer view
-//     Route::get('/singleCustomer', function(){
-//         return view('backend.customers.singleCustomer');
-//     })->name('customer');
-
-//     // transaction
-//     Route::get('/broadcast', function () {
-//         return view('backend.broadcasts.send_broadcast');
-//     })->name('broadcast');
-
-//     Route::get('/broadcast/compose', function () {
-//             return view('backend.broadcasts.compose_broadcast');
-//         })->name('compose');
-
-//     Route::get('/transactions', 'TransactionController@index')->name('transactions');
-//     Route::get('/transactions/{id}', 'SingleTransactionController@index')->name('view_transaction');
-
-
-// Route::get('/backend/complaint_log' , 'ComplaintlogController@index');
-
-// Route::get('/backend/2f4k7e34o', function () {
-//     return view('backend.complaintlog.delete_complaint');
-// });
-
-// Route::get('/backend/1123', function () {
-//     return view('backend.complaintlog.update_status');
-// });
-
-// // all users
-
-//     Route::get('/users', 'UsersController@index')->name('users');
-//     Route::get('/users/{id}', 'UsersController@show')->name('user.view');
-
-
-//     Route::get('/debt_reminders', function () {
-//         return view('backend.debt_reminder.index');
-//     })->name('debts.reminder');
-
-
-//     Route::get('/complaint', function () {
-//         return view('backend.complaints.complaintform');
-//     })->name('complaint.form');
-
-//     Route::get('/complaint_log', function () {
-//         return view('backend.complaints.complaintlog');
-//     })->name('complaint.log');
-
-//     Route::get('/change-loc', function () {
-//         return view('backend.location.change_loc');
-//     });
-
-//     // all users
-//     // duplicate routes
-
-//     // Route::get('/users_list', function () {
-//     //     return view('users_list.single_user');
-//     // })->name('users.list');
-
-//     // Route::get('/view_user', function () {
-//     //     return view('backend.users_list.show');
-//     // })->name('user.view');
-
-//     // analytics
-//     Route::get('/analytics', function () {
-//         return view('backend.analytics.analytics');
-//     })->name('analytics');
-
-//     // stores
-//     Route::get('/stores', 'StoreController@index')->name('stores');
-
-//     Route::get('/create_store', function () {
-//         return view('backend.stores.create');
-//     })->name('store.create');
-
-
-//     Route::get('/view_store', function () {
-//         return view('backend.stores.show');
-//     })->name('store.view');
-
-//     Route::get('/edit_store', function () {
-//         return view('backend.stores.edit');
-//     })->name('store.edit');
-
-// Route::get('/edit_customer/{customer_id}', function () {
-//     return view('backend.customers.edit_customer');
-// })->name('customer.edit');
-//     Route::get('/settings', 'SettingsController@index')->name('settings');
-
-//     Route::post('/settings', 'SettingsController@update')->name('settings.update');
-
-//     Route::get('/edit_assistants', function () {
-//         return view('backend.store-assistants.edit_assistants');
-//     })->name('assistants.edit');
-
-//     Route::get('/edit_customer', function () {
-//         return view('backend.customers.edit_customer');
-//     })->name('customer');
-
-//     // Route::get('/singleCustomer', function(){
-//     //     return view('backend.customers.singleCustomer');
-//     // })->name('customer');
-
-//     // assistant
-//     Route::get('/add_assistant', function () {
-//         return view('backend.store-assistants.add_assistant');
-//     })->name('assistants.add');
-
-//     //notifications page
-//     Route::get('/notifications', function () {
-//         return view('backend.notifications.user_notification');
-//     })->name('notification');
-
-//     Route::put('/complaint_log/update/{id}' , 'ComplaintlogController@update');
-
-// });

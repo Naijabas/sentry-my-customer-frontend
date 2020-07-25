@@ -4,8 +4,6 @@
 
 @stop
 
-
-
 @section('content')
 <div class="container-fluid">
     <div class="row page-title align-items-center">
@@ -50,9 +48,9 @@
                 <div class="card-body">
                     <h5 class="card-title mt-0 mb-0 header-title">Transaction Overview</h5>
                     <div id="sales-by-category-chart" class="apex-charts mb-0 mt-4" dir="ltr"></div>
-                </div> <!-- end card-body-->
-            </div> <!-- end card-->
-        </div> <!-- end col-->
+                </div> 
+            </div>
+        </div> 
   
         <div class="col-xl-7">
             <div class="card">
@@ -99,8 +97,9 @@
                         </div>
                         <div class="align-self-center">
                             <div id="today-product-sold-chart" class="apex-charts"></div>
-                            <span class="text-danger font-weight-bold font-size-13"><i class='uil uil-arrow-down'></i>
-                                0%</span>
+                            <span class="text-danger font-weight-bold font-size-13">
+                                <i class='uil uil-arrow-down'></i>0%
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -112,14 +111,15 @@
                 <div class="card-body p-0">
                     <div class="media p-3">
                         <div class="media-body">
-                            <span class="text-muted text-uppercase font-size-12 font-weight-bold">New
-                                Customers</span>
+                            <span class="text-muted text-uppercase font-size-12 font-weight-bold">
+                                New Customers</span>
                             <h2 class="mb-0">0</h2>
                         </div>
                         <div class="align-self-center">
                             <div id="today-new-customer-chart" class="apex-charts"></div>
-                            <span class="text-success font-weight-bold font-size-13"><i class='uil uil-arrow-up'></i>
-                                0%</span>
+                            <span class="text-success font-weight-bold font-size-13">
+                                <i class='uil uil-arrow-up'></i>0%
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -146,18 +146,9 @@
         </div>
     </div>
 
-  
-
-    <!-- products -->
-    <div class="row">
-    </div>
-    <!-- end row -->
-
-
 </div>
 
 @endsection
-
 
 @section("javascript")
 

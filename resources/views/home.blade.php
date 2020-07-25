@@ -73,38 +73,59 @@
                     <h3>Invoice reminders</h3>
                     <p>This solution helps <br> business owners send overdue invoice <br> reminders to customers</p>
                 </div>
-                <div class="feature__image" data-aos="fade-right" data-aos-duration="1500">
-                    <img src="{{asset('frontend/assets/images/screen two.png')}}" alt="screen"
-                        class="feature__img__screen img-fluid">
-                </div>
-            </div>
+                {{-- <div class="feature__image" data-aos="fade-right" data-aos-duration="1500">
+                      <img src="{{asset('frontend/assets/images/screen two.png')}}" alt="screen"
+                class="feature__img__screen img-fluid">
+            </div> --}}
         </div>
-        <div class="col-lg-4">
-            <div class="feature-container">
-                <div class="feature__text">
-                    <h3>Debt collection</h3>
-                    <p>It makes it easier to keep track and manage debt collection easily through mobile devices</p>
-                </div>
-                <div class="feature__image" data-aos="fade-up">
-                    <img src="{{asset('frontend/assets/images/screen.png')}}" alt=""
-                        class="feature__img__screen img-fluid">
-                </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="feature-container">
+            <div class="feature__text">
+                <h3>Debt collection</h3>
+                <p>It makes it easier to keep track and manage debt collection easily through mobile devices</p>
             </div>
+            {{-- <div class="feature__image" data-aos="fade-up">
+                            <img src="{{asset('frontend/assets/images/screen.png')}}" alt=""
+            class="feature__img__screen
+            img-fluid">
+        </div> --}}
+    </div>
+</div>
+<div class="col-lg-4">
+    <div class="feature-container">
+        <div class="feature__text">
+            <h3>Sales messaging</h3>
+            <p>Provides a way for business owners to push unique sales messaging directly to their
+                customers.</p>
         </div>
-        <div class="col-lg-4">
-            <div class="feature-container">
-                <div class="feature__text">
-                    <h3>Sales messaging</h3>
-                    <p>Provides a way for business owners to push unique sales messaging directly to their
-                        customers.</p>
-                </div>
-                <div class="feature__image" data-aos="fade-left" data-aos-duration="1500">
-                    <img src="{{asset('frontend/assets/images/screen two.png')}}" alt=""
-                        class="feature__img__screen img-fluid">
+        {{-- <div class="feature__image" data-aos="fade-left" data-aos-duration="1500">
+                            <img src="{{asset('frontend/assets/images/screen two.png')}}" alt=""
+        class="feature__img__screen
+        img-fluid">
+    </div> --}}
+</div>
+</div>
+</div>
+
+<!-- App Screen Shot Area -->
+<div class="app-screen-shot-area section-padding-100" id="work">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="app-shot">
+                    <div><img src="/frontend/assets/img/bg-img/21.png" alt=""></div>
+                    <div><img src="/frontend/assets/img/bg-img/22.png" alt=""></div>
+                    <div><img src="/frontend/assets/img/bg-img/23.png" alt=""></div>
+                    <div><img src="/frontend/assets/img/bg-img/18.png" alt=""></div>
+                    <div><img src="/frontend/assets/img/bg-img/19.png" alt=""></div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+<!-- App Screen Shot Area -->
+
 </div>
 
 <!-- App Screen Shot Area -->

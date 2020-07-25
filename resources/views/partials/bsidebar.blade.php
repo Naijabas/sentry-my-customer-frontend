@@ -1,11 +1,18 @@
 <!-- ========== Left Sidebar Start ========== -->
 <div class="left-side-menu">
-    
+
     <div class="sidebar-content">
         <!--- Sidemenu -->
         <div id="sidebar-menu" class="slimscroll-menu">
             <ul class="metismenu" id="menu-bar">
                 <li class="menu-title">Navigation</li>
+
+                <li>
+                    <a href="{{ route('dashboard') }}">
+                        <i data-feather="home"></i>
+                        <span> Dashboard</span>
+                    </a>
+                </li>
 
                 @if(\Illuminate\Support\Facades\Cookie::get('user_role') == 'super_admin')
                     {{-- super admin protected routes here --}}
@@ -23,13 +30,12 @@
                     @include('partials.menus_items.store_assistant')
                 @endif
 
-                {{-- @wealth removed changed password from here, its now inside settings page --}}
-                {{-- <li>
-                <a href="{{ route('change_password') }}">
-                     <i class="uil  uil-cog"></i>
-                        <span> Change Password </span>
-                 </a>
-                </li> --}}
+                <li>
+                    <a href="{{ route('setting') }}">
+                        <i class="uil  uil-cog"></i>
+                        <span> Settings </span>
+                    </a>
+                </li>
 
             </ul>
         </div>

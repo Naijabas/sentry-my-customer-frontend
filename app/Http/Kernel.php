@@ -64,6 +64,8 @@ class Kernel extends HttpKernel
         'backend.auth' => \App\Http\Middleware\BackendAuth::class,
         'backend.super.admin' => \App\Http\Middleware\SuperAdminAuth::class,
         'store.assistant' => \App\Http\Middleware\StoreAssistant::class,
+        'backend.store.assistant' => \App\Http\Middleware\StoreAssistantAuth::class,
+        'backend.store.admin' => \App\Http\Middleware\StoreAdminAuth::class,
     ];
 
     /**

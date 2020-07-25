@@ -20,6 +20,15 @@
                                             <a href="index.html">
                                                 <img src="{{ ('/frontend/assets/images/fulllogo.png') }}" alt="" height="auto" /> </a>
                                         </div>
+
+                                        @if ($errors->any())
+                                            @foreach ($errors->all() as $error)
+                                                <div class="alert alert-danger">
+                                                    {{ $error }}
+                                                </div>
+                                            @endforeach
+                                        @endif
+
                                         @if(Session::has('message'))
                                         <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">
                                             {{ Session::get('message') }}</p>
@@ -44,7 +53,7 @@
                                             @csrf
                                             <div class="form-group">
                                                 <label class="form-control-label">OTP</label>
-                                                <a href="" class="float-right text-muted text-unline-dashed ml-1" id="resend_code">resend code</a>
+                                                <a href="{{route('password')}}" class="float-right text-muted text-unline-dashed ml-1" id="resend_code">resend code</a>
                                                 <div class="input-group input-group-merge">
                                                     <input type="number" id="otp" name="otp" class="form-control" required>
                                                 </div>
