@@ -138,7 +138,7 @@
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <label>Phone Number</label>
-                                                            <input class="form-control" type="text" name="phone_number" value="{{ isset($user_details['phone_number']) ? $user_details['phone_number'] : "" }}" readonly>
+                                                            <input id ="phone" value="{{$phone_number}}" readonly>
                                                         </div>
                                                     </div>
                                                     <div class="clearfix"></div><br>
@@ -393,8 +393,29 @@
 @endsection
 
 @section("javascript")
+
+	 <script src="/backend/assets/build/js/intlTelInput.js"></script>
 <script>
-var navigation = () => {
+    var input = document.querySelector("#phone");
+    var test = window.intlTelInput(input, {
+        separateDialCode: true,
+        // any initialisation options go here
+    });
+    $("#phone").keyup(() => {
+        if ($("#phone").val().charAt(0) == 0) {
+            $("#phone").val($("#phone").val().substring(1));
+        }
+    });
+    $("#submitForm").submit((e) => {
+        e.preventDefault();
+        const dialCode = test.getSelectedCountryData().dialCode;
+        if ($("#phone").val().charAt(0) == 0) {
+            $("#phone").val($("#phone").val().substring(1));
+        }
+        $("#phone_number").val(dialCode + $("#phone").val());
+        $("#submitForm").off('submit').submit();
+    });	
+	var navigation = () => {
   var locationHash = window.location.hash || "#edit-profile";
   $(".hash-candidate").removeClass("active");
   $(locationHash).addClass("active");
