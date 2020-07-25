@@ -139,7 +139,7 @@
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <label>Phone Number</label>
-                                                           <input class="form-control" type="text" id ="phone" name="phone_number" value="{{ isset($user_details['phone_number']) ? $user_details['phone_number'] : "" }}" readonly>
+                                                           <input class="form-control" type="text" id ="phone_number" name="phone_number" value="{{ isset($user_details['phone_number']) ? $user_details['phone_number'] : "" }}" readonly>
                                                         </div>
                                                     </div>
                                                     <div class="clearfix"></div><br>
