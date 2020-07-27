@@ -30,8 +30,7 @@ class AssistantController extends Controller
      */
     public function index(Request $request)
     {
-// TODO: Cleanup codes
-
+    // TODO: Cleanup codes
         try {
             $url = env('API_URL', 'https://dev.api.customerpay.me') . '/assistant';
             $client = new Client();
@@ -142,8 +141,6 @@ class AssistantController extends Controller
 
     public function store(Request $request)
     {
-        //return dd($request->all());
-
         $url = env('API_URL', 'https://dev.api.customerpay.me') . '/assistant/new';
 
         //return dd($request->all());
@@ -169,14 +166,11 @@ class AssistantController extends Controller
                     'store_id' => $request->input('store_id')
                 ],
             ];
-            //return dd($payload);
             $response = $client->request("POST", $url, $payload);
             $statusCode = $response->getStatusCode();
 
-            //return $statusCode;
             $body = $response->getBody();
             $data = json_decode($body);
-            //return dd($data);
 
             if ($statusCode == 201 || $statusCode == 200) {
                 $request->session()->flash('alert-class', 'alert-success');
@@ -188,7 +182,6 @@ class AssistantController extends Controller
                 return redirect()->route('assistants.index');
             }
         } catch (ClientException $e) {
-            // dd($e);
             $response = $e->getResponse();
             $statusCode = $response->getStatusCode();
 

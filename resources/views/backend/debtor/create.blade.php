@@ -20,9 +20,8 @@
                                 
                                 <div class="card">
                                     <div class="card-body">
-                                        @if(Session::has('message') || $errors->any())
-                                        <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-                                    @endif
+                                        @include('partials.alert.message')
+
                                         <form method="POST" action="{{route('debtor.store')}}" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-group">

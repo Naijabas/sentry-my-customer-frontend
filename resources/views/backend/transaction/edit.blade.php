@@ -16,21 +16,8 @@
                         <h4 class="mt-2">Edit Transaction</h4>
                     </div>
                 </div>
-
-                @if(session('message'))
-                <p class="alert alert-success">{{ session('message') }}</p>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                {{-- , $response->store_ref_id --}}
+                
+                @include('partials.alert.message')
                 
                 <div class="row">
                      <div class="col-lg-12">

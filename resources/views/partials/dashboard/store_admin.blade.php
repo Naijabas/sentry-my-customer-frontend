@@ -30,7 +30,7 @@
                             <div class="row">
                                 <div class="col-6">
                                     <h5 class="font-size-15">{{ $data->customerCount }}</h5>
-                                    <p class="text-muted mb-0">Customers</p>
+                                    <p class="text-muted mb-0">Customer(s)</p>
                                 </div>
                                 <div class="col-6">
                                     <h5 class="font-size-15">{{ $data->storeCount }}</h5>
@@ -204,7 +204,7 @@
                 </div>
 
                 <div class="debts-table">
-                    <table class="table table-hover table-nowrap mb-0">
+                    <table class="table table-hover table-nowrap mb-0 table-responsive">
                         <thead>
                         <tr>
                             <th scope="col">Store Name</th>

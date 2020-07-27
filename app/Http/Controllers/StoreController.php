@@ -223,13 +223,13 @@ class StoreController extends Controller
                 'storeData' => $StoreData,
                 "transactions" => $store_transactions
             ];
-
+                // return print_r($StoreData);
+                // die();
             if ($statusCode == 200  && $transaction_statusCode == 200) {
-
+              
                 return view('backend.stores.show')->with('response', $StoreData)->with('number', 1);
             }
         } catch (RequestException $e) {
-
             Log::info('Catch error: LoginController - ' . $e->getMessage());
 
             // check for 5xx server error
@@ -248,6 +248,7 @@ class StoreController extends Controller
             return redirect()->route('store.index', ['response' => []]);
         } catch (\Exception $e) {
             //log error;
+            return $e;
             Log::error('Catch error: StoreController - ' . $e->getMessage());
             return view('errors.500');
         }
@@ -444,6 +445,126 @@ class StoreController extends Controller
             if ($statusCode == 200  && $transaction_statusCode == 200) {
 
                 return view('backend.stores.show_debt')->with('response', $StoreData)->with('number', 1);
+            }
+        } catch (RequestException $e) {
+
+            Log::info('Catch error: LoginController - ' . $e->getMessage());
+
+            // check for 5xx server error
+            if ($e->getResponse()->getStatusCode() >= 500) {
+                return view('errors.500');
+            } else if ($e->getResponse()->getStatusCode() == 401) {
+                $request->session()->flash('alert-class', 'alert-danger');
+                Session::flash('message', "Your Session Has Expired, Please Login Again");
+                return redirect()->route('logout');
+            }
+            // get response to catch 4xx errors
+            $response = json_decode($e->getResponse()->getBody());
+            Session::flash('alert-class', 'alert-danger');
+
+            Session::flash('message', $response->message);
+            return redirect()->route('store.index', ['response' => []]);
+        } catch (\Exception $e) {
+            //log error;
+            Log::error('Catch error: StoreController - ' . $e->getMessage());
+            return view('errors.500');
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function receivable(Request $request, $id)
+    {
+        $url = env('API_URL', 'https://dev.api.customerpay.me') . '/store/' . $id;
+        $transactions_url = env('API_URL', 'https://dev.api.customerpay.me') . '/transaction/store/' . $id;
+        try {
+            $client = new Client;
+            $payload = [
+                'headers' => [
+                    'x-access-token' => Cookie::get('api_token')
+                ]
+            ];
+            $response = $client->request("GET", $url, $payload);
+            $transaction_response =  $client->request("GET", $transactions_url, $payload);
+            $statusCode = $response->getStatusCode();
+            $transaction_statusCode = $transaction_response->getStatusCode();
+            $body = $response->getBody();
+            $transactions_body = $transaction_response->getBody();
+
+            $store_transactions = json_decode($transactions_body)->data->transactions;
+            $StoreData = json_decode($body)->data->store;
+            $StoreData = [
+                'storeData' => $StoreData,
+                "transactions" => $store_transactions
+            ];
+
+            if ($statusCode == 200  && $transaction_statusCode == 200) {
+
+                return view('backend.stores.show_receivable')->with('response', $StoreData)->with('number', 1);
+            }
+        } catch (RequestException $e) {
+
+            Log::info('Catch error: LoginController - ' . $e->getMessage());
+
+            // check for 5xx server error
+            if ($e->getResponse()->getStatusCode() >= 500) {
+                return view('errors.500');
+            } else if ($e->getResponse()->getStatusCode() == 401) {
+                $request->session()->flash('alert-class', 'alert-danger');
+                Session::flash('message', "Your Session Has Expired, Please Login Again");
+                return redirect()->route('logout');
+            }
+            // get response to catch 4xx errors
+            $response = json_decode($e->getResponse()->getBody());
+            Session::flash('alert-class', 'alert-danger');
+
+            Session::flash('message', $response->message);
+            return redirect()->route('store.index', ['response' => []]);
+        } catch (\Exception $e) {
+            //log error;
+            Log::error('Catch error: StoreController - ' . $e->getMessage());
+            return view('errors.500');
+        }
+    }
+
+     /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function revenue(Request $request, $id)
+    {
+        $url = env('API_URL', 'https://dev.api.customerpay.me') . '/store/' . $id;
+        $transactions_url = env('API_URL', 'https://dev.api.customerpay.me') . '/transaction/store/' . $id;
+        try {
+            $client = new Client;
+            $payload = [
+                'headers' => [
+                    'x-access-token' => Cookie::get('api_token')
+                ]
+            ];
+            $response = $client->request("GET", $url, $payload);
+            $transaction_response =  $client->request("GET", $transactions_url, $payload);
+            $statusCode = $response->getStatusCode();
+            $transaction_statusCode = $transaction_response->getStatusCode();
+            $body = $response->getBody();
+            $transactions_body = $transaction_response->getBody();
+
+            $store_transactions = json_decode($transactions_body)->data->transactions;
+            $StoreData = json_decode($body)->data->store;
+            $StoreData = [
+                'storeData' => $StoreData,
+                "transactions" => $store_transactions
+            ];
+
+            if ($statusCode == 200  && $transaction_statusCode == 200) {
+
+                return view('backend.stores.show_revenue')->with('response', $StoreData)->with('number', 1);
             }
         } catch (RequestException $e) {
 

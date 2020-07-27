@@ -17,24 +17,7 @@
                     </div>
                 </div>
 
-                @if(Session::has('message'))
-                <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-                <script>
-                  setTimeout(() => {
-                    document.querySelector('.alert').style.display = 'none'
-                  }, 3000);
-                </script>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                @include('partials.alert.message')
 
                 <div class="row">
                      <div class="col-lg-12">

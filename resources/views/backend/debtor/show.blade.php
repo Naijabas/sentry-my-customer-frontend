@@ -7,28 +7,31 @@
 @section('content')
 <div class="account-pages my-2">
     <div class="container-fluid">
-        @include('partials.alertMessage')
+        @include('partials.alert.message')
         <div class="row-justify-content-center">
             <div class="card">
                 <div class="card-body p-2">
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-md-4">
                             <h5 class="card-title">Debtor Overview - Created
                                 {{ \Carbon\Carbon::parse($debtor->createdAt)->diffForhumans() }}</h5>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="d-flex">
-                                <a href="{{ route('markpaid', $debtor->_id) }}" class="flex-1 btn btn-success mr-2">
-                                    <i class="far mr-2"></i>Mark as paid
+                        <div class="col-md-8">
+                            <div class="row text-center container-fluid">
+                                <a href="{{ route('markpaid', $debtor->_id) }}" class="col-md-2 offset-1 mt-1 btn btn-sm btn-success">
+                                    Mark as paid <i class="feather-16" data-feather="check"></i>
                                 </a>
-                                <a href="" data-toggle="modal" data-target="#sendReminderModal"
-                                    class="btn btn-warning mr-3"> Send Debt Reminder </i>
+                                <a href="" data-toggle="modal" data-target="#sendReminderModal" class="col-md-2 offset-1 mt-1 btn btn-sm btn-warning">
+                                    Send Reminder 
+                                    {{-- <i class="feather-16" data-feather="send"></i> --}}
                                 </a>
-                                <a href="" data-toggle="modal" data-target="#bs-example-modal-sm"
-                                    class="flex-1 btn btn-success mr-2">
-                                    <i class="far mr-2 fa-edit"></i>Schedule Reminder
+                                {{-- <a href="#" class="col-md-2 offset-1 mt-1 btn btn-sm btn-warning" data-toggle="modal" data-target="#scheduleReminderModal"> --}}
+                                    {{-- Schedule Reminder  --}}
+                                    {{-- <i class="feather-16" data-feather="message-circle"></i> --}}
+                                {{-- </a> --}}
+                                <a href="/admin/debtor" class="col-md-2 offset-1 mt-1 btn btn-sm btn-primary go-back">
+                                    Go Back <i class="feather-16" data-feather="arrow-left"></i>
                                 </a>
-                                <a href="/admin/debtor" class="flex-1 btn btn-primary go-back">Go Back</a>
                             </div>
                         </div>
                     </div>
@@ -122,33 +125,11 @@
             </div>
 
             {{-- Modal for send reminder --}}
-            <div class="modal fade" id="sendReminderModal" tabindex="-1" role="dialog"
-                aria-labelledby="mySmallModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-sm">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <form
-                                action="{{ route('reminder', $debtor->store_ref_id.'-'.$debtor->customer_ref_id.'-'.$debtor->_id) }}"
-                                method="POST">
-                                @csrf
-                                <input type="hidden" name="transaction_id" value="{{old('transaction_id', $debtor->_id)}}">
+            @include('partials.modal.sendReminder')
 
-                                <div class="form-group">
-                                    <label>Message</label>
-                                    <p>
-                                        <span>characters remaining: <span id="rem_reminderMessage"
-                                                title="140"></span></span>
-                                    </p>
-                                    <textarea name="message" class="countit form-control" id="reminderMessage"
-                                        placeholder="Message" maxlength="140" row="10">{{ old('message') }}</textarea>
-                                </div>
+            {{-- Modal for schedule reminder --}}
+            @include('partials.modal.scheduleReminder')
 
-                                <button type="submit" class="btn btn-primary btn-block">Send Reminder</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -156,5 +137,5 @@
 @endsection
 
 @section('javascript')
-
+<script src="{{ asset('/backend/assets/js/textCounter.js')}}"></script>
 @endsection

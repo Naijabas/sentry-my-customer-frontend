@@ -11,7 +11,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
         <!-- App favicon -->
-        <link rel="shortcut icon" href="/backend/assets/images/favicon.ico">
+        <link rel="shortcut icon" href="/frontend/assets/favicon.ico">
 
         <!-- plugins -->
         <link href="/backend/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />

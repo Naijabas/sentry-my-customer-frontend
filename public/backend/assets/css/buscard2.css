@@ -3,6 +3,7 @@
     width: 591px;
     height: 342px;
     background: #E7F0FA;
+    position: relative;
 
     /* background-image: url("../img/bg-left.png"), url("../img/bg-right.png"); */
     background-position:left bottom, right bottom;
@@ -105,3 +106,18 @@
 
 
 
+
+
+.img-right, .img-left{
+    position: absolute;
+}
+
+.img-left{
+    left: 0;
+    bottom: 0;
+}
+
+.img-right{
+    right: 0;
+    bottom: 1px;
+}

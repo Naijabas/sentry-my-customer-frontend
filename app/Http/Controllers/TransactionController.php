@@ -177,19 +177,14 @@ class TransactionController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $transaction_id = explode('-', $id)[0];
-        $store_id = explode('-', $id)[1];
-        $customer_id = explode('-', $id)[2];
+        $transactionID = explode('-', $id)[0];
+        $storeID = explode('-', $id)[1];
+        $customerID = explode('-', $id)[2];
 
-        if (Cookie::get('user_role') == 'super_admin') {
-            $getTransUrl = $this->host . '/transaction/admin/' . $transaction_id . '/' . $store_id . '/' . $customer_id;
-            $customerUrl = $this->host . '/store/all';
-            // $customerUrl = $this->host . '/customer/all';
-        } else {
-            $getTransUrl = $this->host . '/transaction' . '/' . $transaction_id . '/' . $store_id . '/' . $customer_id;
-            $storeUrl = $this->host . '/store';
-            $customerUrl = $this->host . '/customer';
-        }
+        $getTransUrl = $this->host . '/transaction' . '/' . $transactionID . '/' . $storeID . '/' . $customerID;
+                
+        $storeUrl = $this->host . '/store';
+        $customerUrl = $this->host . '/customer';
 
         $api_token = $this->api_token;
 
@@ -206,23 +201,9 @@ class TransactionController extends Controller
             $transacStatusCode = $transactionResponse->getStatusCode();
 
             if ($customerStatusCode == 200 && $transacStatusCode == 200) {
-                if (Cookie::get('user_role') == 'super_admin') {
-                    $stores = json_decode($customerResponse->getBody())->data->stores;
-                    $_stores = [];
-                    foreach ($stores as $adminStores) {
-                        foreach ($adminStores as $store) {
-                            $store->storeId = $store->_id;
-                            $store->storeId = $store->store_name;
-                            $_stores[] = $store;
-                        }
-                    }
-                    $stores = $_stores;
-                } else {
-                    $stores = json_decode($customerResponse->getBody())->data->customer;
-                }
-
+                $stores = json_decode($customerResponse->getBody())->data->customer;
                 $transaction = json_decode($transactionResponse->getBody())->data->transaction;
-
+                // dd($stores);
                 return view('backend.transaction.show', compact("stores", "api_token", "transaction"));
             } else if ($customerStatusCode == 401 && $transacStatusCode == 401) {
                 return redirect()->route('login')->with('message', "Please Login Again");

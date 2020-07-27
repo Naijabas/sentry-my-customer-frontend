@@ -11,18 +11,8 @@
             <div class="row page-title">
                 <div class="col-md-12">
                     <nav aria-label="breadcrumb" class="float-right mt-1"></nav>
-                    @if(Session::has('message'))
-                        <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-                    @endif
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    @include('partials.alert.message')
+
                     <h4 class="mb-1 mt-0">Submit a Complaint</h4>
                 </div>
             </div>
@@ -39,30 +29,29 @@
                             <form method="post" action="{{route('complaint.store')}}">
                                 @csrf
                                 <h5>Log your Complaint</h5>
-                                <br />
+                                <br/>
                                 <div class="col">
                                     <div class="form-group row">
                                         <label class="col-lg-2 col-form-label">Subject</label>
                                         <div class="col-lg-10">
-                                            <input type="text" name="subject" class="form-control" placeholder="Subject" />
+                                            <input type="text" name="subject" class="form-control"
+                                                   placeholder="Subject"/>
                                         </div>
                                     </div>
 
                                     <div class="form-group row">
                                         <label class="col-lg-2 col-form-label">Message</label>
                                         <div class="col-lg-10">
-                                            <textarea class="form-control" name="message" rows="5" placeholder="Please enter your complaint here">{{old('message')}}</textarea>
+                                            <textarea class="form-control" name="message" rows="5"
+                                                      placeholder="Please enter your complaint here">{{old('message')}}</textarea>
                                         </div>
                                     </div>
                                     <div class="float-right">
                                         <button class="btn btn-primary">Send</button>
                                     </div>
 
-                                    <form method="get" action="{{ route('complaint.index') }}">
-                                        <div>
-                                            <button class="btn btn-danger">Cancel</button>
-                                        </div>
-                                    </form>
+                                    <a href="{{ route('complaint.index') }}" class="btn btn-danger">Cancel</a>
+
                                 </div>
                             </form>
 

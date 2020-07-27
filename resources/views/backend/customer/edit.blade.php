@@ -14,6 +14,8 @@
 <div class="content">
     @isset($response)
     <div class="container-fluid">
+        @include('partials.alert.message')
+
         {{-- start of page title --}}
         <div class="row page-title">
             <div class="col-md-12">
@@ -45,21 +47,6 @@
 
             <div class="col-lg-9 col-md-8 col-sm-7">
                 {{-- start of card --}}
-                @if(Session::has('message'))
-                <br>
-                <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-                <script>
-                    setTimeout(() => {
-                        document.querySelector('.alert').style.display = 'none'
-                    }, 3000);
-
-                </script>
-                @elseif ( $errors->any() )
-                <br class='alert'>
-                @foreach ( $errors->all() as $error )
-                <p class="alert alert-danger">{{$error}}</p>
-                @endforeach
-                @endif
 
                 <div class="card">
                     <div class="card-body">

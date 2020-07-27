@@ -7,6 +7,7 @@
 
 @section('content')
 <div class="container-fluid">
+    @include('partials.alert.message')
     <div class="row ">
         <div class="col-lg-4 bg-white">
             <div class=" m-h-100">
@@ -20,19 +21,6 @@
                                             <a href="index.html">
                                                 <img src="{{ ('/frontend/assets/images/fulllogo.png') }}" alt="" height="auto" /> </a>
                                         </div>
-
-                                        @if ($errors->any())
-                                            @foreach ($errors->all() as $error)
-                                            <div class="alert alert-danger">
-                                                {{ $error }}
-                                            </div>
-                                            @endforeach
-                                        @endif
-
-                                        @if(Session::has('message'))
-                                        <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">
-                                            {{ Session::get('message') }}</p>
-                                        @endif
 
                                         <h6 class="h5 mb-0 mt-4">Reset Password</h6>
                                         <p class="text-muted mt-1 mb-5">

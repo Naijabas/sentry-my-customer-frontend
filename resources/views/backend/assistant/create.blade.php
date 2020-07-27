@@ -22,20 +22,7 @@
             </div>
         </div>
 
-
-        @if(Session::has('message'))
-            <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-        @endif
-
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        @include('partials.alert.message')
 
         <div class="row h-100 justify-content-center align-items-center">
             <div class="col-lg-12">

@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        @include('partials.alertMessage')
+        @include('partials.alert.message')
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -96,7 +96,6 @@
                                         </td>
                                     </tr>
                                     @endforeach
-
 
                                     {{-- Modal for delete Store --}}
                                     <div class="modal fade" id="storeDelete" tabindex="-1" role="dialog"
@@ -192,25 +191,7 @@
                 </div>
             </div>
         </div>
-        @if(Session::has('message'))
-        <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-        <script>
-            setTimeout(() => {
-                document.querySelector('.alert').style.display = 'none'
-            }, 3000);
-
-        </script>
-        @endif
-
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
+       
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -283,20 +264,14 @@
                                                         store</a>
                                                     <a class="dropdown-item" href="" data-toggle="modal"
                                                         data-target="#storeDelete">Deleted store</a>
-                                                    {{-- <form action="{{ route('store.destroy', $store->_id) }}"
-                                                    method="POST" id="form">
-                                                    @method('DELETE')
-                                                    @csrf
-                                                    </form> --}}
+                                                 
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
                                     @endforeach
 
-
                                     @endforeach
-
 
                                     {{-- Modal for delete Store --}}
                                     <div class="modal fade" id="storeDelete" tabindex="-1" role="dialog"

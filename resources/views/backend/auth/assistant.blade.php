@@ -26,18 +26,7 @@
                                         <p class="text-muted mt-1 mb-4">Enter your phone number and password to
                                             access admin panel.</p>
 
-                                        @if(Session::has('message'))
-                                        <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">
-                                            {{ Session::get('message') }}</p>
-                                        @endif
-
-                                        @if ($errors->any())
-                                        @foreach ($errors->all() as $error)
-                                        <div class="alert alert-danger">
-                                            {{ $error }}
-                                        </div>
-                                        @endforeach
-                                        @endif
+                                        @include('partials.alert.message')
 
                                         <form action="{{ route('assistant.authenticate') }}" class="authentication-form"
                                             method="POST" id="submitForm">

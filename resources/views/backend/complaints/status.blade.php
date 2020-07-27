@@ -4,20 +4,12 @@
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
+        @include('partials.alert.message')
+
             <div class="row page-title">
                 <div class="col-md-12">
                     <nav aria-label="breadcrumb" class="float-right mt-1"></nav>
-                    @if(Session::has('message'))
-                        <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-                        @endif @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                
                     <h4 class="mb-1 mt-0">Submit a Complaint</h4>
                 </div>
             </div>

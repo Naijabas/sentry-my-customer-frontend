@@ -3,20 +3,14 @@
 @section('content')
     <div class="account-pages my-5">
         <div class="container-fluid">
+        @include('partials.alert.message')
+
             <div class="row-justify-content-center">
                 <div class="row">
                     <div class="col">
                         <div class="card">
 
                             <div class="card-body p-0">
-                                <div>
-                                    @if( \Session::has('error'))
-                                        <div class="alert alert-danger">
-                                            {!! \Session::get('error') !!}
-                                        </div>
-                                    @endif
-                                </div>
-                                <br>
                                 <div style="padding: 20px;">
                                     <a href="{{ route('complaint.index') }}" class="btn btn-primary float-right"> Back &nbsp;<i class="fa fa-plus my-float"></i> </a>
                                     <h4 class="header-title mt-0 mb-1">Complaint Overview</h4>

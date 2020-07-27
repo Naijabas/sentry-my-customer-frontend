@@ -10,6 +10,8 @@
 
 {{-- error messages --}}
 <div class="container-fluid">
+    @include('partials.alert.message')
+
     <div class="row ">
         <div class="col-lg-4 bg-white">
             <div class=" m-h-100">
@@ -23,25 +25,6 @@
                                             <a href="{{ route('home') }}">
                                                 <img src="{{ ('/frontend/assets/images/fulllogo.png') }}" alt="" height="auto" /> </a>
                                         </div>
-
-                                        @if(Session::has('message'))
-                                        <div class="alert {{ Session::get('alert-class', 'alert-danger') }} alert-dismissible fade show" role="alert">
-                                            {{ Session::get('message') }}
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        @endif
-
-                                        @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
-                                                <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        @endif
 
                                         <h6 class="h5 mb-0 mt-4">Verify Code</h6>
                                         <p class="text-muted mt-1 mb-5">

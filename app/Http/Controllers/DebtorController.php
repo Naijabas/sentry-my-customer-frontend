@@ -228,25 +228,29 @@ class DebtorController extends Controller
     {
     }
 
-    public function sendReminder(Request $request, $id)
+    public function sendReminder(Request $request)
     {
-        // /debt/send
-        $store_ref_id = explode('-', $id)[0];
-        $customer_ref_id = explode('-', $id)[1];
-        $ts_ref_id = explode('-', $id)[2];
-        $_id = $request->transaction_id;
-        $message = $request->message;
 
+        $request->validate([
+            'store_id' => 'required',
+            'customer_id' => 'required',
+            'transaction_id' => 'required',
+            'message' => 'required|min:10|max:140',
+        ]);
 
-        $url = env('API_URL', 'https://dev.api.customerpay.me') .'/debt'. '/send'.'/'.$store_ref_id.'/'.$customer_ref_id.'/'.$ts_ref_id;
+        $storeID = $request->store_id;
+        $customerID = $request->customer_id;
+        $transactionID = $request->transaction_id;
+
+        $url = env('API_URL', 'https://dev.api.customerpay.me') .'/debt'. '/send'.'/'.$storeID.'/'.$customerID.'/'.$transactionID;
 
         try {
             $client =  new Client();
             $payload = [
                 'headers' => ['x-access-token' => Cookie::get('api_token')],
                 'form_params' => [
-                    'transaction_id' => $_id,
-                    'message' => $message,
+                    'transaction_id' => $transactionID,
+                    'message' => $request->message,
                 ],
             ];
 
@@ -257,14 +261,12 @@ class DebtorController extends Controller
             $data = json_decode($body);
 
             if ($statusCode == 200 && $data->success) {
-                // return \
                 $request->session()->flash('alert-class', 'alert-success');
-                Session::flash('message', $data->Message);
-
+                Session::flash('message', $data->message);
                 return redirect()->back();
             } else {
                 $request->session()->flash('alert-class', 'alert-waring');
-                // Session::flash('message', $data->message);
+                Session::flash('message', $data->message);
                 return redirect()->back();
             }
         } catch (RequestException $e) {
@@ -279,11 +281,8 @@ class DebtorController extends Controller
                 $response = $e->getResponse()->getBody();
                 $result = json_decode($response);
                 Session::flash('message', isset($result->message) ? $result->message : $result->Message);
-                $debtors = [];
-                $stores = [];
-                return view('backend.transaction.index',  compact('debtors', 'stores'));
+                return redirect()->back();
             }
-
             //5xx server error
             return view('errors.500');
         } catch (\Exception $e) {
@@ -297,13 +296,18 @@ class DebtorController extends Controller
     {
 
         $request->validate([
+            'time' =>  'required|date_format:H:i',
+            'store_id' => 'required',
+            'customer_id' => 'required',
+            'scheduleDate' => 'required|date_format:Y-m-d',
             'transaction_id' => 'required',
-            'scheduleDate' => 'required',
-            'time' =>  'required',
         ]);
 
-        $url = env('API_URL', 'https://dev.api.customerpay.me') . '/debt/schedule';
+        $storeID = $request->store_id;
+        $customerId = $request->customer_id;
+        $transactionID = $request->transaction_id;
 
+        $url = env('API_URL', 'https://dev.api.customerpay.me') . '/debt/schedule' .'/'. $storeID .'/'. $customerId .'/'. $transactionID;
 
         try {
             $client =  new Client();
@@ -312,11 +316,12 @@ class DebtorController extends Controller
                 'form_params' => [
                     'scheduleDate' => $request->scheduleDate,
                     'time' => $request->time,
-                    'transaction_id' => $request->transaction_id,
                     'message' => $request->message,
                 ],
             ];
+
             $response = $client->request("POST", $url, $payload);
+            dd($response);
 
             $statusCode = $response->getStatusCode();
             $body = $response->getBody();
@@ -325,10 +330,10 @@ class DebtorController extends Controller
             if ($statusCode == 200  && $data->success) {
                 $request->session()->flash('alert-class', 'alert-success');
                 Session::flash('message', $data->Message);
-
                 return back();
             } else {
                 $request->session()->flash('alert-class', 'alert-success');
+                Session::flash('message', $data->Message);
                 return redirect()->back();
             }
         } catch (RequestException $e) {
@@ -342,7 +347,8 @@ class DebtorController extends Controller
             if ($e->hasResponse()) {
                 $response = $e->getResponse()->getBody();
                 $result = json_decode($response);
-                Session::flash('message', $result->Message);
+                $message = isset($result->Message) ? $result->Message : $result->message;
+                Session::flash('message', $message);
                 $debtors = [];
                 $stores = [];
                 return view('backend.debtor.index',  compact('debtors', 'stores'));

@@ -140,6 +140,7 @@ class LoginController extends Controller
         }
         return redirect()->route('login.assistant');
     }
+
     public function authenticate(Request $request)
     {
         $this->validateUser($request);
@@ -164,9 +165,9 @@ class LoginController extends Controller
                     // store data to cookie
                     Cookie::queue('api_token', $response->data->user->api_token);
                     Cookie::queue('user_role', $response->data->user->local->user_role);
-                    Cookie::queue('first_name', $response->data->user->local->first_name);
+                    Cookie::queue('first_name', isset($response->data->user->local->first_name) ? $response->data->user->local->first_name : $response->data->user->local->name);
                     Cookie::queue('email', $response->data->user->local->email);
-                    Cookie::queue('last_name', $response->data->user->local->last_name);
+                    Cookie::queue('last_name', isset($response->data->user->local->last_name) ? $response->data->user->local->last_name : $response->data->user->local->name);
                     Cookie::queue('is_active', $data->is_active);
                     Cookie::queue('phone_number', $data->phone_number);
                     Cookie::queue('user_id', $response->data->user->_id);
@@ -215,10 +216,11 @@ class LoginController extends Controller
         return redirect()->route('login');
     }
 
-    public function validateUser(Request $request){
+    public function validateUser(Request $request)
+    {
 
-		$rules = [
-            'phone_number' => ['required', 'min:6','max:16', new DoNotAddIndianCountryCode, new DoNotPutCountryCode],
+        $rules = [
+            'phone_number' => ['required', 'min:6', 'max:16', new DoNotAddIndianCountryCode, new DoNotPutCountryCode],
             'password' => ['required', 'min:6']
         ];
 
@@ -227,6 +229,6 @@ class LoginController extends Controller
             'password.*' => 'Invalid Credentials',
         ];
 
-		$this->validate($request, $rules, $messages);
+        $this->validate($request, $rules, $messages);
     }
 }

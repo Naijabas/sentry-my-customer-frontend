@@ -32,16 +32,8 @@
         <div class="row-justify-content-center">
             <div class="h2"><i data-feather="edit" class="icon-dual"></i> Change Password</div>
             <div class="col-md-9 " style="margin: 0 auto">
-                @if(Session::has('message'))
-                <p class="alert {{ Session::get('alert-class', 'alert-danger') }}">{{ Session::get('message') }}</p>
-                @endif
-                @if ($errors->any())
-                @foreach ($errors->all() as $error)
-                <div class="alert alert-danger">
-                    {{ $error }}
-                </div>
-                @endforeach
-                @endif
+                @include('partials.alert.message')
+
                 <div class="card p-4">
                     <div class="" id="password-change">
                         <div class="tile user-settings">

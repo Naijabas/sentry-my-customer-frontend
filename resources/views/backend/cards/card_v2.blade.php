@@ -1,45 +1,45 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyCustomer Business Card</title>
-    <link rel="stylesheet" href="{{asset('backend/assets/css/buscard2.css')}}">
-    <link href="https://fonts.googleapis.com/css2?family=Bad+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href={{public_path('backend/assets/css/buscard2.css')}}>
+    {{-- <link href="https://fonts.googleapis.com/css2?family=Bad+Script&display=swap" rel="stylesheet"> --}}
 </head>
 
 <style>
-       @font-face {
+@font-face {
     font-family: Gilroy-Bold;
-    src: url("{{asset('backend/assets/fonts/Gilroy-Bold.ttf')}}");
+    src: url("{{public_path()}}/backend/assets/fonts/Gilroy-Bold.ttf");
 }
 @font-face {
     font-family: Gilroy;
-    src: url("{{asset('backend/assets/fonts/Gilroy-Regular.ttf')}}");
+    src: url("{{public_path()}}/backend/assets/fonts/Gilroy-Regular.ttf");
 }
 @font-face {
     font-family: Gilroy-Medium;
-    src: url("{{asset('backend/assets/fonts/Gilroy-Medium.ttf')}}");
+    src: url("{{public_path()}}/backend/assets/fonts/Gilroy-Medium.ttf");
 }
-.container{
-        background-image: url("{{asset('backend/assets/images/bg-left.png')}}"), url("{{asset('backend/assets/images/bg-right.png')}}");
-    }
 </style>
 
 <body>
     <div class="container">
         <div class="text">
-            <h4 class="hh1">Le' Fashionista.</h4>
-            <h4 class="hh2">Value for style</h4>
+            <img src="{{public_path('backend/assets/images/bg-left.png')}}" alt="" class="img-left">
+             <img src="{{public_path('backend/assets/images/bg-right.png')}}" alt="" class="img-right">
+            <h4 class="hh1">{{$store_details->store_name}}</h4>
+            <h4 class="hh2">{{$store_details->tagline}}</h4>
 
 
-            <h1 class="hh3">Eke Adenike</h1>
-            <h5 class="hh4">CEO, Le' fashionista</h5>
+            <h1 class="hh3">{{Cookie::get('first_name') ." ". Cookie::get('last_name') }}</h1>
+            <h5 class="hh4">{{Cookie::get('user_role')}}</h5>
 
-            <h4 class="hh5">+234704466371</h4>
-            <h4 class="hh6">lefashionista@zmail.com</h4>
+            <h4 class="hh5">{{$store_details->phone_number}}</h4>
+            <h4 class="hh6">{{$store_details->email}}</h4>
 
-            <h4 class="hh7">No 10 Garki road, Old bus-stop, Industrial layout, Abuja, Nigeria</h4>
+            <h4 class="hh7">{{$store_details->shop_address}}</h4>
         </div>
             
     </div>

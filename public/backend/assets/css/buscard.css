@@ -332,18 +332,18 @@ body{
     top: 24px;
     z-index: 5;
 }
-
-/* @font-face {
+/* 
+@font-face {
     font-family: Gilroy-Bold;
-    src: url("../fonts/Gilroy-Bold.ttf");
+    src: url("backend/assets/fonts/GilroyBold.ttf");
 }
 @font-face {
     font-family: Gilroy;
-    src: url("../fonts/Gilroy-Regular.ttf");
+    src: url("backend/assets/fonts/GilroyRegular.ttf");
 }
 @font-face {
     font-family: Gilroy-Medium;
-    src: url("../fonts/Gilroy-Medium.ttf");
+    src: url("backend/assets/fonts/GilroyMedium.ttf");
 } */
   
   

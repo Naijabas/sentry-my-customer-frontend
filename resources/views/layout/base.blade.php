@@ -11,7 +11,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="/backend/assets/images/favicon.ico">
+    <link rel="shortcut icon" href="/frontend/assets/favicon.ico">
 
     <!-- plugins -->
     <link href="/backend/assets/libs/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
@@ -60,9 +60,9 @@
 
     </div>
 
-    <!-- JS
-============================================ -->
+    <!-- JS============================================ -->
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <!-- Vendor js -->
     <script src="/backend/assets/js/vendor.min.js"></script>
 
@@ -79,6 +79,7 @@
 
     <!-- App js -->
     <script src="/backend/assets/js/app.min.js"></script>
+    <script src="/backend/assets/js/alert.js"></script>
     @yield('javascript')
 </body>
 

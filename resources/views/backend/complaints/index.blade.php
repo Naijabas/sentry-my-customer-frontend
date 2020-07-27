@@ -14,6 +14,7 @@
 <div class="container-fluid">
     <div class="content">
         <div class="container-fluid">
+            @include('partials.alert.message')
 
             <div class="card" style="margin-top: 10px;">
                 <div id="wrapper">
@@ -22,18 +23,6 @@
                             <div class="card">
 
                                 <div class="card-body">
-                                    <div>
-                                        @if( \Session::has('success'))
-                                        <div class="alert alert-success">
-                                            {!! \Session::get('success') !!}
-                                        </div>
-                                        @endif
-                                        @if( \Session::has('error'))
-                                        <div class="alert alert-danger">
-                                            {!! \Session::get('error') !!}
-                                        </div>
-                                        @endif
-                                    </div>
 
                                     <a href="{{ route('complaint.create') }}" class="btn btn-primary float-right">
                                         Add Complaint &nbsp;<i class="fa fa-plus my-float"></i>

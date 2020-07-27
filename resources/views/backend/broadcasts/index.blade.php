@@ -16,21 +16,7 @@
             </div>
         </div>
 
-        @if(session('error'))
-            <div class="row">
-                <div class="col-12">
-                    <p class="alert alert-danger"> {{ session('error') }} </p>
-                </div>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div class="row">
-                <div class="col-12">
-                    <p class="alert alert-success"> {{ session('success') }} </p>
-                </div>
-            </div>
-        @endif
+        @include('partials.alert.message')
 
         <div class="row">
             <div class="col-12">

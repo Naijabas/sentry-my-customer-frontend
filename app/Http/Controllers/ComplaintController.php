@@ -72,7 +72,7 @@ class ComplaintController extends Controller
         //dd($request->all());
         $request->validate([
             'subject' => 'required',
-            'message' => 'required|max:500'
+            'message' => 'required|max:500|min:10'
         ]);
 
         $user_id = Cookie::get('user_id');
