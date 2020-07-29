@@ -27,6 +27,9 @@ class SettingsController extends Controller
         Cookie::get('email') !== null ?  $user_details['email'] = Cookie::get('email') : "";
         Cookie::get('first_name') !== null ?  $user_details['first_name'] = Cookie::get('first_name') : "";
         Cookie::get('last_name') !== null ?  $user_details['last_name'] = Cookie::get('last_name') : "";
+          Cookie::get('account_name') !== null ?  $user_details['account_name'] = Cookie::get('account_name') : "";
+            Cookie::get('account_number') !== null ?  $user_details['account_number'] = Cookie::get('account_number') : "";
+              Cookie::get('bank') !== null ?  $user_details['bank'] = Cookie::get('bank') : "";
         Cookie::get('phone_number') !== null ?  $user_details['phone_number'] = Cookie::get('phone_number') : "";
         Cookie::get('is_active') !== null ?  $user_details['is_active'] = Cookie::get('is_active') : "";
         return view('backend.settings.settings')->with("user_details", $user_details);
@@ -55,7 +58,10 @@ class SettingsController extends Controller
                     $data = [
                         "first_name" => $request->input('first_name'),
                         "last_name" => $request->input('last_name'),
-                        "email" => $request->input('email')
+                        "email" => $request->input('email'),
+                         "account_name" => $request->input('account_name'),
+                          "account_number" => $request->input('account_number'),
+                           "bank" => $request->input('bank')
                     ];
                     // make an api call to update the user_details
                     $this->headers = ['headers' => ['x-access-token' => Cookie::get('api_token')], 'form_params' => $data];
@@ -84,16 +90,24 @@ class SettingsController extends Controller
                         $user_detail_res = json_decode($response->getBody(), true);
                         $filtered_user_detail = $user_detail_res['data']['store_admin']['local'];
                         $user_details = [
-                            "email" => $filtered_user_detail['email'],
-                            "phone_number" => $filtered_user_detail['phone_number'],
-                            "first_name" => $filtered_user_detail['first_name'],
-                            "last_name" => $filtered_user_detail['last_name'],
+                            "email" => isset($filtered_user_detail['email'])? $filtered_user_detail['email'],
+                            "phone_number" => isset($filtered_user_detail['phone_number'])? $filtered_user_detail['phone_number'],
+                            "first_name" =>  isset($filtered_user_detail['first_name'])? $filtered_user_detail['first_name'],
+                            "last_name" =>  isset($filtered_user_detail['last_name'])? $filtered_user_detail['last_name'],
+                             "account_name" =>  isset($filtered_user_detail['account_name'])? $filtered_user_detail['account_name'],
+                              "account_number" =>  isset($filtered_user_detail['account_number'])? $filtered_user_detail['account_number'],
+                               "bank" =>  isset($filtered_user_detail['bank'])? $filtered_user_detail['bank'],
                             "is_active" => Cookie::get('is_active')
                         ];
-                        Cookie::queue('phone_number', $filtered_user_detail['phone_number']);
-                        Cookie::queue('first_name', $filtered_user_detail['first_name']);
-                        Cookie::queue('email', $filtered_user_detail['email']);
-                        Cookie::queue('last_name', $filtered_user_detail['last_name']);
+                        Cookie::queue('phone_number', isset($filtered_user_detail['phone_number'])? $filtered_user_detail['phone_number']);
+                        Cookie::queue('first_name',isset($filtered_user_detail['first_name'])? $filtered_user_detail['first_name']);
+                        Cookie::queue('email',isset($filtered_user_detail['email'])? $filtered_user_detail['email']);
+                        Cookie::queue('last_name',isset($filtered_user_detail['last_name'])? $filtered_user_detail['last_name']);
+                        Cookie::queue('account_name',isset($filtered_user_detail['account_name'])? $filtered_user_detail['account_name']);
+                        Cookie::queue('account_number',isset($filtered_user_detail['account_number'])? $filtered_user_detail['account_number']);
+                        Cookie::queue('bank',isset($filtered_user_detail['bank'])? $filtered_user_detail['bank']);
+
+
                         $request->session()->flash('message', "Profile details updated successfully");
                         return redirect()->route('setting')->with("user_details", $user_details);
                     }
