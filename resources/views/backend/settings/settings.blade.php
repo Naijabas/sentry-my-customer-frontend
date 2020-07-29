@@ -153,7 +153,7 @@
                                                     <div class="clearfix"></div><br>
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <label>Account number</label>
+                                                            <label>Account Number</label>
                                                             <input class="form-control" type="text" name="account_number" placeholder="{{ isset($user_details['account_number']) ? $user_details['account_number'] : "Account Number" }}">
                                                         </div>
                                                     </div>
