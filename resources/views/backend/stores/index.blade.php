@@ -77,7 +77,7 @@
                                     <div class="contact-links d-flex font-size-20">
                                         <div class="flex-fill">
                                             <a href="{{ route('store.show', $store[0]->_id) }}" data-toggle="tooltip"
-                                               data-placement="top" title="" data-original-title="View User"><i
+                                               data-placement="top" title="" data-original-title="View Store"><i
                                                         data-feather="eye"></i></a>
                                         </div>
 
