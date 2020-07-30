@@ -1,0 +1,241 @@
+@font-face {
+  font-family: Gilroy;
+   src: url("../fonts/gilroy-light.woff") format("woff");
+}
+@font-face {
+  font-family: GilroyBold;
+   src: url("../fonts/gilroy-bold.woff") format("woff");
+}
+
+body {
+  padding: 0px;
+  margin: 0px;
+  background: #eee;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  font-weight: 100%;
+  font-family: Gilroy, "Courier New", Courier, monospace;
+}
+
+header {
+  width: 100%;
+  height: 70px;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+header img {
+  width: 40px;
+  height: 40px;
+}
+header h3 {
+  font-weight: bolder;
+  /* font-family: GilroyBold, "Courier New", Courier, monospace; */
+  padding: 5px;
+  font-weight: bold;
+}
+header span {
+  position: relative;
+  top: -4px;
+  left: -5px;
+  font-size: 2em;
+  color: #1d6aff;
+}
+/*   color: #333cc1;
+  color: #eb5757;
+  #1d6aff
+
+ */
+
+main {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+  max-width: 1000px;
+  box-sizing: border-box;
+}
+main .title {
+  font-size: 1.3em;
+  letter-spacing: 1px;
+  font-family: GilroyBold, "Courier New", Courier, monospace;
+  font-size: 1.3em;
+  padding: 30px 0px;
+  color: #333;
+  text-align: center;
+}
+main .total {
+  display: flex;
+  width: 100%;
+  font-size: 0.85em;
+  box-sizing: border-box;
+  padding: 10px 10px;
+  color: #333;
+  justify-content: space-between;
+}
+
+main .payBox {
+  display: block;
+  align-items: center;
+  width: 100%;
+  margin: 0px auto;
+  max-width: 500px;
+  box-sizing: border-box;
+  padding: 20px;
+  text-decoration: none;
+}
+main .switchBox {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 10px auto;
+  height: 50px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+main .switchBox div {
+  display: flex;
+  width: 500%;
+  align-items: center;
+  height: 100%;
+  justify-content: center;
+  color: #333cc1;
+  background: white;
+}
+main .switchBox div.active {
+  background: #333cc1;
+  color: white;
+}
+main .switchBox div .wallet {
+  width: 30px;
+  height: 30px;
+  margin: auto 10px;
+}
+
+main .payBox .forms {
+  display: flex;
+  width: 100%;
+  min-width: 100%;
+  padding: 5px 0px;
+  margin: 0px auto;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  flex-grow: 1;
+}
+main .payBox .forms form {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+}
+
+main .payBox .forms form .inputGroup {
+  width: 100%;
+  display: flex;
+  margin-top: 20px;
+  flex-flow: row nowrap;
+}
+main .payBox .forms form .inputBox {
+  width: 100%;
+  display: flex;
+  margin-top: 20px;
+  flex-flow: column nowrap;
+}
+main .payBox .forms form .inputGroup .inputBox {
+  margin: auto 0px;
+  flex-flow: row wrap;
+  width: auto;
+}
+main .payBox .forms form .inputBox label {
+  text-decoration: none;
+  font-size: 0.9em;
+  margin-bottom: 5px;
+  color: #333;
+}
+main .payBox .forms form .inputGroup .inputBox label {
+  width: 100%;
+  margin-bottom: 5px;
+  display: flex;
+}
+main .payBox .forms form .inputGroup .inputBox label .circle {
+  background: #666;
+  display: flex;
+  margin: auto 10px;
+  justify-content: center;
+  align-items: center;
+  font-style: normal;
+  border-radius: 50%;
+  flex-shrink: 0;
+  width: 1.2em;
+  height: 1.2em;
+  font-size: 0.85em;
+  color: white;
+}
+
+main .payBox .forms form .inputBox input {
+  width: 100%;
+  border: 1px solid #666;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 10px;
+  height: 40px;
+  color: #bbb;
+  font-size: 1.3em;
+}
+main .payBox .forms form .inputBox input:focus {
+  color: #222;
+}
+
+main .payBox .forms form .inputGroup .inputBox.expiry {
+  width: 66%;
+  flex-shrink: 0;
+}
+main .payBox .forms form .inputGroup .inputBox.cvv {
+  margin-left: auto;
+  width: 80px;
+}
+main .payBox .forms form .inputGroup .inputBox select {
+  width: 80px;
+  max-width: 40%;
+  height: 40px;
+  margin-right: 5%;
+  border-radius: 5px;
+  padding: 5px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid #666;
+}
+main .payBox .forms form .inputGroup .inputBox input {
+  width: 80px;
+  margin: auto;
+  font-size: 1em;
+}
+
+main button.submit {
+  font-family: NilroyBold, "Courier New", Courier, monospace;
+  font-size: 1.2em;
+  letter-spacing: 1px;
+  background: #333cc1;
+  color: white;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  margin-top: 70px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+@media only screen and (min-width: 720px) {
+  main .total {
+    width: 200px;
+    margin: 0px auto;
+  }
+  main button.submit {
+    width: 250px;
+    border-radius: 5px;
+    margin: 50px auto 5px auto;
+  }
+}
