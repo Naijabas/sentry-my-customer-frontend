@@ -58,7 +58,7 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <p class="text-muted">This month</p>
-                        <h3>${{$data->amountForCurrentMonth}}</h3>
+                        <h3>{{ Cookie::get('currencyIcon') }}{{$data->amountForCurrentMonth}}</h3>
                         <p class="text-muted"><span class="text-{{$profit['profit']? 'success':'danger'}} mr-2"> {{$profit['percentage']}}
                                 % <i class="mdi mdi-arrow-down"></i>
                                 </span> From
@@ -85,7 +85,7 @@
                         <div class="media">
                             <div class="media-body">
                                 <p class="text-muted font-weight-medium">Debt</p>
-                                <h4 class="mb-0">${{$data->debtAmount}}</h4>
+                                 <h4 class="mb-0">{{ Cookie::get('currencyIcon') }}{{$data->debtAmount}}</h4>
                             </div>
 
                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary align-self-center">
@@ -103,7 +103,7 @@
                         <div class="media">
                             <div class="media-body">
                                 <p class="text-muted font-weight-medium">Revenue</p>
-                                <h4 class="mb-0">${{$data->revenueAmount}}</h4>
+                                <h4 class="mb-0">{{ Cookie::get('currencyIcon') }}{{$data->revenueAmount}}</h4>
                             </div>
 
                             <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
@@ -121,7 +121,7 @@
                         <div class="media">
                             <div class="media-body">
                                 <p class="text-muted font-weight-medium">Receivables</p>
-                                <h4 class="mb-0">${{$data->receivablesAmount}}</h4>
+                                <h4 class="mb-0">{{ Cookie::get('currencyIcon') }}{{$data->receivablesAmount}}</h4>
                             </div>
 
                             <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
