@@ -95,7 +95,7 @@
                         <div class="media">
                             <div class="media-body">
                                 <p class="text-muted font-weight-medium">Debt</p>
-                                <h4 class="mb-0">${{$data->debtAmount}}</h4>
+                                 <h4 class="mb-0">{{ format_money($data->debtAmount) }}</h4>
                             </div>
 
                             <div class="mini-stat-icon avatar-sm rounded-circle bg-primary align-self-center">
@@ -113,7 +113,9 @@
                         <div class="media">
                             <div class="media-body">
                                 <p class="text-muted font-weight-medium">Revenue</p>
-                                <h4 class="mb-0">${{$data->revenueAmount}}</h4>
+                                <h4 class="mb-0">{{ format_money($data->revenueAmount) }}</h4>
+
+
                             </div>
 
                             <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
@@ -131,7 +133,8 @@
                         <div class="media">
                             <div class="media-body">
                                 <p class="text-muted font-weight-medium">Receivables</p>
-                                <h4 class="mb-0">${{$data->receivablesAmount}}</h4>
+                        <h4 class="mb-0">{{ format_money($data->receivablesAmount) }}</h4>
+
                             </div>
 
                             <div class="avatar-sm rounded-circle bg-primary align-self-center mini-stat-icon">
@@ -269,12 +272,11 @@
         var options = {
             series: [{
                 name: 'Transaction',
-                data: {
-                    {
+                data:
+                    {{
                         json_encode($data - > chart)
                     }
-                },
-            }],
+                            }],
             chart: {
                 height: 350,
                 type: 'line',

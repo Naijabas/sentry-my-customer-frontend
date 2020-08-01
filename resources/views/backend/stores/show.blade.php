@@ -147,7 +147,8 @@ $total_interestReceivables += $each_interestReceivables;
                             <div class="media">
                                 <div class="media-body">
                                     <p class="text-muted font-weight-medium">Revenue</p>
-                                    <h4 class="mb-0">$ {{ $total_Revenue }}</h4>
+                                    <h4 class="mb-0">{{ format_money($total_Revenue) }}</h4>
+
                                 </div>
 
                                 <div class="mini-stat-icon avatar-sm align-self-center rounded-circle bg-primary">
@@ -172,7 +173,7 @@ $total_interestReceivables += $each_interestReceivables;
                             <div class="media">
                                 <div class="media-body">
                                     <p class="text-muted font-weight-medium">Receivables</p>
-                                    <h4 class="mb-0">$ {{ $total_Receivables }}</h4>
+                                      <h4 class="mb-0">{{ format_money($total_Receivables) }}</h4>
                                 </div>
 
                                 <div class="avatar-sm align-self-center mini-stat-icon rounded-circle bg-primary">
@@ -198,7 +199,7 @@ $total_interestReceivables += $each_interestReceivables;
                             <div class="media">
                                 <div class="media-body">
                                     <p class="text-muted font-weight-medium">Debt</p>
-                                    <h4 class="mb-0">$ {{ $totalDept }}</h4>
+                                    <h4 class="mb-0">{{ format_money($totalDept) }}</h4>
                                 </div>
 
                                 <div class="avatar-sm align-self-center mini-stat-icon rounded-circle bg-primary">
